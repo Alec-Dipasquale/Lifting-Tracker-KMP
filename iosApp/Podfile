@@ -1,0 +1,9 @@
+
+platform :ios, '14.1'
+
+target 'iosApp' do
+  use_frameworks!
+
+  # Include the shared module
+  pod 'shared', :path => '../shared'
+end
