@@ -37,7 +37,7 @@ kotlin {
         commonMain.dependencies {
             implementation(libs.androidx.room.runtime)
             implementation("androidx.sqlite:sqlite-bundled:2.5.0-SNAPSHOT")
-            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")
+            implementation(libs.kotlinx.serialization)
             implementation(libs.koin.core)
             implementation(libs.koin.test)
             //put your multiplatform dependencies here
@@ -46,8 +46,6 @@ kotlin {
             //put your multiplatform dependencies here
         }
         androidMain.dependencies {
-            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")
-            implementation("androidx.room:room-ktx:2.7.0-alpha04")
 //            implementation(project(":workoutmanagement"))
             //put your multiplatform dependencies here
         }

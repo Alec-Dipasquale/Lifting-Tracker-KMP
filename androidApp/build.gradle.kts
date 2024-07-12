@@ -3,8 +3,7 @@ plugins {
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.compose.compiler)
     id("androidx.room") version "2.7.0-alpha04"
-
-
+    kotlin("plugin.serialization") version "1.5.31"
 }
 
 android {
@@ -51,6 +50,8 @@ dependencies {
     implementation(libs.koin.core)
 
     implementation(libs.timber)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.kotlinx.serialization)
 
 
     debugImplementation(libs.compose.ui.tooling)
