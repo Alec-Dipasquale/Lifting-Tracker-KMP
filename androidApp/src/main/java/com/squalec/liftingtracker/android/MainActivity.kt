@@ -20,11 +20,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.squalec.liftingtracker.appdatabase.AppDatabase
 import com.squalec.liftingtracker.appdatabase.DBFactory
-import com.squalec.liftingtracker.appdatabase.populateExerciseDetailsDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.koin.core.context.startKoin
 import timber.log.Timber
 
 class MainActivity : ComponentActivity() {
@@ -33,9 +31,10 @@ class MainActivity : ComponentActivity() {
 
         Timber.d("Hi, I am Main Class")
 
-        val db = DBFactory.createDatabase()
+        val dbFactory = DBFactory
+        val db = dbFactory.createDatabase()
         CoroutineScope(context = Dispatchers.IO).launch {
-            populateExerciseDetailsDatabase()
+            dbFactory.populateExerciseDetailsDatabase()
             Timber.d("[Database123] Database populated")
         }
 
