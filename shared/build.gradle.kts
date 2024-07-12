@@ -7,13 +7,20 @@ plugins {
     id("androidx.room") version "2.7.0-alpha04"
     id("com.google.devtools.ksp") version "2.0.0-1.0.21"
     kotlin("plugin.serialization") version "1.5.31"
+    id("com.rickclephas.kmp.nativecoroutines") version "1.0.0-ALPHA-17"
 }
 
 kotlin {
+
+    jvm {
+        compilations.all {
+            kotlinOptions {
+                jvmTarget = "11"
+            }
+        }
+    }
     androidTarget {
     }
-
-
     iosArm64()
     iosX64()
     iosSimulatorArm64()
@@ -34,12 +41,23 @@ kotlin {
     }
 
     sourceSets {
+
+        all {
+            languageSettings.optIn("kotlin.experimental.ExperimentalObjCName")
+        }
+
+
         commonMain.dependencies {
             implementation(libs.androidx.room.runtime)
             implementation("androidx.sqlite:sqlite-bundled:2.5.0-SNAPSHOT")
             implementation(libs.kotlinx.serialization)
             implementation(libs.koin.core)
             implementation(libs.koin.test)
+            implementation("com.russhwolf:multiplatform-settings-no-arg:1.1.1")
+            implementation("com.russhwolf:multiplatform-settings-serialization:1.1.1")
+            implementation("com.russhwolf:multiplatform-settings-coroutines:1.1.1")
+            implementation("com.rickclephas.kmm:kmm-viewmodel-core:1.0.0-ALPHA-17")
+
             //put your multiplatform dependencies here
         }
         iosMain.dependencies {
@@ -63,8 +81,8 @@ android {
         minSdk = 29
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 }
 
@@ -90,6 +108,6 @@ tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>>().configureEach
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
     }
 }

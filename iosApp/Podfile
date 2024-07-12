@@ -6,4 +6,8 @@ target 'iosApp' do
 
   # Include the shared module
   pod 'shared', :path => '../shared'
+  pod 'KMPNativeCoroutinesAsync', '1.0.0-ALPHA-13'
+  pod 'KMPNativeCoroutinesCombine', '1.0.0-ALPHA-13'
+  pod 'KMPNativeCoroutinesRxSwift', '1.0.0-ALPHA-13'
+  pod 'KMMViewModelSwiftUI', '1.0.0-ALPHA-12'
 end
