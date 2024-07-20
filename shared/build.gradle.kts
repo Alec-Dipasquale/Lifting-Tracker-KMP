@@ -7,18 +7,9 @@ plugins {
     id("androidx.room") version "2.7.0-alpha04"
     id("com.google.devtools.ksp") version "2.0.0-1.0.21"
     kotlin("plugin.serialization") version "1.5.31"
-    id("com.rickclephas.kmp.nativecoroutines") version "1.0.0-ALPHA-17"
 }
 
 kotlin {
-
-    jvm {
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "11"
-            }
-        }
-    }
     androidTarget {
     }
     iosArm64()
@@ -53,10 +44,6 @@ kotlin {
             implementation(libs.kotlinx.serialization)
             implementation(libs.koin.core)
             implementation(libs.koin.test)
-            implementation("com.russhwolf:multiplatform-settings-no-arg:1.1.1")
-            implementation("com.russhwolf:multiplatform-settings-serialization:1.1.1")
-            implementation("com.russhwolf:multiplatform-settings-coroutines:1.1.1")
-            implementation("com.rickclephas.kmm:kmm-viewmodel-core:1.0.0-ALPHA-17")
 
             //put your multiplatform dependencies here
         }

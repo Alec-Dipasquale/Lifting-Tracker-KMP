@@ -42,4 +42,27 @@ interface ExerciseDetailDao {
     @Query("SELECT * FROM exercise_details WHERE LOWER(name) LIKE '%' || LOWER(:search) || '%'")
     suspend fun searchExercises(search: String): List<ExerciseDetails>
 
+    @Query("""
+        SELECT * FROM exercise_details 
+        WHERE (:search IS NULL OR LOWER(name) LIKE '%' || LOWER(:search) || '%')
+        AND (:muscles IS NULL OR primaryMuscles IN (:muscles) OR secondaryMuscles IN (:muscles))
+        AND (:equipment IS NULL OR equipment LIKE '%' || :equipment || '%')
+        AND (:level IS NULL OR level LIKE '%' || :level || '%')
+        AND (:force IS NULL OR force LIKE '%' || :force || '%')
+        AND (:mechanic IS NULL OR mechanic LIKE '%' || :mechanic || '%')
+        AND (:category IS NULL OR category LIKE '%' || :category || '%')
+    """)
+    suspend fun searchWithFilters(
+        search: String? = null,
+        muscles: List<String>? = null,
+        equipment: String? = null,
+        level: String? = null,
+        force: String? = null,
+        mechanic: String? = null,
+        category: String? = null
+    ): List<ExerciseDetails>
+
+    @Query("SELECT DISTINCT primaryMuscles FROM exercise_details")
+    suspend fun getMuscleNames(): List<String>
+
 }
