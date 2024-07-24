@@ -9,6 +9,9 @@ interface ExerciseDetailDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(exercises: List<ExerciseDetails>)
 
+    @Query("SELECT * FROM exercise_details WHERE id = :id")
+    suspend fun getExerciseDetailsById(id: String): ExerciseDetails?
+
     @Query("SELECT * FROM exercise_details")
     suspend fun getAllExercises(): List<ExerciseDetails>
 

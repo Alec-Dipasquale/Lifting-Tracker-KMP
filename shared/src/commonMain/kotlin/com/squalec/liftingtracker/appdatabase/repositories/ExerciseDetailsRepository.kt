@@ -24,6 +24,8 @@ internal interface ExerciseDetailsRepository {
         category: String? = null
     ): List<ExerciseDetails>
 
+    suspend  fun getExerciseDetails(id: String): ExerciseDetails?
+
 }
 // todo koin injection for dao
 class ExerciseDetailsRepositoryImpl(
@@ -68,5 +70,9 @@ class ExerciseDetailsRepositoryImpl(
             mechanic = mechanic,
             category = category
         )
+    }
+
+    override suspend fun getExerciseDetails(id: String): ExerciseDetails? {
+        return exerciseDetailsDao.getExerciseDetailsById(id)
     }
 }

@@ -6,7 +6,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform).apply(false)
     alias(libs.plugins.compose.compiler).apply(false)
     id("com.google.devtools.ksp") version "2.0.0-1.0.21" apply false
-    kotlin("plugin.serialization") version "1.5.31" apply false
+    kotlin("plugin.serialization") version "2.0.0" apply false
     id("com.rickclephas.kmp.nativecoroutines") version "1.0.0-ALPHA-17"
 
 }

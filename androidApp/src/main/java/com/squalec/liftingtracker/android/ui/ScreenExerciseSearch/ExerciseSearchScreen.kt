@@ -53,7 +53,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.wear.compose.material.ContentAlpha
 import com.google.accompanist.flowlayout.FlowRow
-import com.squalec.liftingtracker.android.ui.navigation.ExerciseDetailDestination
+import com.squalec.liftingtracker.android.ui.navigation.Destination
 
 
 @Composable
@@ -137,7 +137,7 @@ fun ExerciseSearchScreen(
                     )
                     Icon(
                         modifier = Modifier.clickable {
-                            navController.navigate(ExerciseDetailDestination(exercise.id))
+                            navController.navigate(Destination.ExerciseDetailDestination(exercise.id))
                         },
                         imageVector = Icons.Default.Info,
                         contentDescription = "Exercise Details"
@@ -171,7 +171,6 @@ fun DropDownMuscleSelector(
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = if (selectedMuscles.isEmpty()) "Select muscles" else selectedMuscles.joinToString(),
-                style = TextStyle(color = Color.Black, textAlign = TextAlign.Center)
             )
         }
 
