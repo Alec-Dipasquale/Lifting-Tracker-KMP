@@ -55,6 +55,9 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.3")
     implementation("com.rickclephas.kmm:kmm-viewmodel-core:1.0.0-ALPHA-17")
 
+    implementation("com.google.accompanist:accompanist-flowlayout:0.26.2-beta")
+    implementation(libs.androidx.compose.material)
+
     debugImplementation(libs.compose.ui.tooling)
 
 

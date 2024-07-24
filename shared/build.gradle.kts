@@ -51,6 +51,7 @@ kotlin {
             //put your multiplatform dependencies here
         }
         androidMain.dependencies {
+            implementation(libs.timber)
 //            implementation(project(":workoutmanagement"))
             //put your multiplatform dependencies here
         }

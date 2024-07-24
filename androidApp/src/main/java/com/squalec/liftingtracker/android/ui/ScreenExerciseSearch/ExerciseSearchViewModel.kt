@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.StateFlow
 import com.squalec.liftingtracker.appdatabase.DBFactory
 import com.squalec.liftingtracker.appdatabase.models.ExerciseDetails
+import com.squalec.workoutmodule.data.repositories.ExerciseDetailsRepositoryImpl
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -15,6 +16,10 @@ class ExerciseSearchViewModel : ViewModel() {
 
     private val _state = MutableStateFlow(ExerciseSearchState())
     val state: StateFlow<ExerciseSearchState> = _state
+
+    init {
+        intent(ExerciseSearchIntent.GetAllMuscleNames)
+    }
 
     fun intent(intent: ExerciseSearchIntent) {
         when (intent) {
@@ -32,7 +37,7 @@ class ExerciseSearchViewModel : ViewModel() {
         }
         val db = DBFactory.createDatabase()
         viewModelScope.launch {
-            val muscleNames = db.exerciseDao().getMuscleNames()
+            val muscleNames = ExerciseDetailsRepositoryImpl(db.exerciseDao()).muscleNames()
             Timber.d("Muscle names: $muscleNames")
             _state.update {
                 it.copy(
@@ -41,6 +46,7 @@ class ExerciseSearchViewModel : ViewModel() {
                 )
             }
         }
+        searchExercises("")
     }
 
     private fun searchExercises(
@@ -55,24 +61,23 @@ class ExerciseSearchViewModel : ViewModel() {
         _state.update {
             it.copy(
                 searchText = searchText,
-                isExerciseLoading = true
             )
         }
 
         val db = DBFactory.createDatabase()
         viewModelScope.launch {
             val exercises = db.exerciseDao().searchWithFilters(
-                searchText,
-                muscle,
-                equipment,
-                level,
-                force,
-                mechanic,
-                category
+                searchText?:"",
+                muscle?: emptyList(),
+                equipment?: "",
+                level?: "",
+                force?: "",
+                mechanic?: "",
+                category?: ""
             )
+//            val exercises = db.exerciseDao().searchExercises(searchText)
             _state.update {
                 it.copy(
-                    isExerciseLoading = false,
                     exercises = exercises
                 )
             }

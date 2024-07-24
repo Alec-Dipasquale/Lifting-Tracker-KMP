@@ -10,3 +10,6 @@ object HomeDestination
 
 @Serializable
 object ExerciseSearchDestination
+
+@Serializable
+data class ExerciseDetailDestination(val exerciseId: String)

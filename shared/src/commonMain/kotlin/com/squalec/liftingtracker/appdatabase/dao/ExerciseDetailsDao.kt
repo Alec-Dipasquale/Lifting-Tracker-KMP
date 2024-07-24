@@ -44,7 +44,7 @@ interface ExerciseDetailDao {
 
     @Query("""
         SELECT * FROM exercise_details 
-        WHERE (:search IS NULL OR LOWER(name) LIKE '%' || LOWER(:search) || '%')
+        WHERE LOWER(name) LIKE '%' || LOWER(:search) || '%'
         AND (:muscles IS NULL OR primaryMuscles IN (:muscles) OR secondaryMuscles IN (:muscles))
         AND (:equipment IS NULL OR equipment LIKE '%' || :equipment || '%')
         AND (:level IS NULL OR level LIKE '%' || :level || '%')

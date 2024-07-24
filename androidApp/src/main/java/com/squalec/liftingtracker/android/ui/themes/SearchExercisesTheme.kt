@@ -1,4 +1,4 @@
-package com.squalec.liftingtracker.android
+package com.squalec.liftingtracker.android.ui.themes
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,22 +15,28 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+
 @Composable
-fun MyApplicationTheme(
+fun SearchExercisesTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
+
     val colors = if (darkTheme) {
         darkColorScheme(
-            primary = Color(0xFFBB86FC),
-            secondary = Color(0xFF03DAC5),
-            tertiary = Color(0xFF3700B3)
+            primary = Color(0xFF1D00C7),
+            secondary = Color(0xFFF15A25),
+            tertiary = Color(0xFF3700B3),
+            background = Color(0xFF121212),
+            surface = Color(0xFF121212),
         )
     } else {
         lightColorScheme(
-            primary = Color(0xFF6200EE),
-            secondary = Color(0xFF03DAC5),
-            tertiary = Color(0xFF3700B3)
+            primary = Color(0xFF0000FF),
+            secondary = Color(0xFFFF9742),
+            tertiary = Color(0xFF3700B3),
+            background = Color(0xFFE0E0E0),
+            surface = Color(0xFFE0E0E0),
         )
     }
     val typography = Typography(

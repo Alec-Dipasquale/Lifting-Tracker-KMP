@@ -12,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.squalec.liftingtracker.android.ui.navigation.NavGraph
+import com.squalec.liftingtracker.android.ui.themes.MyApplicationTheme
 import com.squalec.liftingtracker.appdatabase.DBFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
