@@ -1,4 +1,4 @@
-package com.squalec.liftingtracker.android.ui.ScreenExerciseSearch
+package com.squalec.liftingtracker.android.ui.screenExerciseSearch
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

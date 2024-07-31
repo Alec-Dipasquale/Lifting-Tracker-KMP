@@ -4,16 +4,21 @@ import kotlinx.serialization.Serializable
 
 sealed class Destination {
     @Serializable
-    object LoadingDestination
+    object Loading
 
     @Serializable
-    object HomeDestination
+    object Home
 
     @Serializable
-    object ExerciseSearchDestination
+    object ExerciseSearch
 
     @Serializable
-    data class ExerciseDetailDestination(
+    data class ExerciseDetail(
         val exerciseId: String
+    )
+
+    @Serializable
+    data class WorkoutSession(
+        val date: String
     )
 }

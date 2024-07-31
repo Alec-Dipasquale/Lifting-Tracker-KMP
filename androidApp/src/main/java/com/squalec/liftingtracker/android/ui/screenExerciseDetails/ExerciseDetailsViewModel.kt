@@ -1,12 +1,10 @@
-package com.squalec.liftingtracker.android.ui.ExerciseDetails
+package com.squalec.liftingtracker.android.ui.screenExerciseDetails
 
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.drawable.Drawable
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.squalec.liftingtracker.appdatabase.DBFactory
@@ -17,7 +15,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.java.KoinJavaComponent.getKoin
 import java.io.IOException
-import java.io.InputStream
 
 class ExerciseDetailsViewModel : ViewModel() {
     val _state = MutableStateFlow(ExerciseDetailsState())
