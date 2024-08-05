@@ -5,8 +5,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.squalec.liftingtracker.android.ui.screenExerciseDetails.ExerciseDetailScreen
 import com.squalec.liftingtracker.android.ui.LoadingScreen
+import com.squalec.liftingtracker.android.ui.screenExerciseDetails.ExerciseDetailScreen
 import com.squalec.liftingtracker.android.ui.screenExerciseSearch.ExerciseSearchScreen
 import com.squalec.liftingtracker.android.ui.screenHome.HomeScreen
 import com.squalec.liftingtracker.android.ui.themes.ExerciseDetailTheme
@@ -24,7 +24,7 @@ fun NavGraph(isLoading: Boolean) {
 
     NavHost(
         navController = navController,
-        startDestination = Destination.Home
+        startDestination = Destination.ExerciseSearch
     ) {
         composable<Destination.Loading> {
             LoadingScreen()
@@ -45,10 +45,10 @@ fun NavGraph(isLoading: Boolean) {
                 ExerciseDetailScreen(navController = navController, exerciseId = exerciseId.exerciseId)
             }
         }
-        composable<Destination.WorkoutSession> { parameters ->
-            val date = parameters.toRoute<Destination.WorkoutSession>().date
-            WorkoutSession(navController = navController, date = date)
-        }
+//        composable<Destination.WorkoutSession> { parameters ->
+//            val date = parameters.toRoute<Destination.WorkoutSession>().date
+//            WorkoutSessionScreen(navController = navController, date = date)
+//        }
     }
 }
 

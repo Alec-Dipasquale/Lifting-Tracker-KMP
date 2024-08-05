@@ -40,19 +40,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.wear.compose.material.ContentAlpha
 import com.google.accompanist.flowlayout.FlowRow
 import com.squalec.liftingtracker.android.ui.navigation.Destination
+import org.koin.androidx.compose.koinViewModel
 
 
 @Composable
 fun ExerciseSearchScreen(
-    exerciseSearchViewModel: ExerciseSearchViewModel = viewModel(), // Get ViewModel instance
     navController: NavController
 ) {
-    val state by exerciseSearchViewModel.state.collectAsState()
+    val viewModel: ExerciseSearchViewModel = koinViewModel()
+    val state by viewModel.state.collectAsState()
 
     LaunchedEffect(key1 = Unit) {
     }
@@ -71,7 +71,7 @@ fun ExerciseSearchScreen(
             OutlinedTextField(
                 value = state.searchText,
                 onValueChange = {
-                    exerciseSearchViewModel.intent(ExerciseSearchIntent.SearchExercises(it))
+                    viewModel.intent(ExerciseSearchIntent.SearchExercises(it))
                 },
                 label = { Text("Search Exercises") },
                 placeholder = { Text("Enter exercise name") },
@@ -96,7 +96,7 @@ fun ExerciseSearchScreen(
                 muscleNames = state.muscleNames ?: emptyList(),
                 selectedMuscles = state.filters.muscle ?: emptyList(),
                 onMuscleClicked = { musclesSelected ->
-                    exerciseSearchViewModel.intent(
+                    viewModel.intent(
                         ExerciseSearchIntent.UpdateFilter(
                             ExerciseFilters(
                                 muscle = musclesSelected

@@ -19,23 +19,4 @@ data class ExerciseDetails(
     @ColumnInfo(name = "instructions") val instructions: List<String>? = emptyList(),
     @ColumnInfo(name = "category") val category: String,
     @ColumnInfo(name = "images") val images: List<String>? = emptyList(),
-){
-//    fun getImageBitmap(context: Context): List<Bitmap>? {
-//        val assetManager = context.assets
-//        var istr: InputStream
-//        var bitmap: List<Bitmap> = emptyList()
-//
-//        try {
-//            for (image in images?: emptyList()) {
-//                istr = assetManager.open(image)
-//                bitmap = bitmap + BitmapFactory.decodeStream(istr)
-//            }
-//        } catch (e: IOException) {
-//            // handle the exception, possibly return null or a default image
-//            e.printStackTrace()
-//            return null
-//        }
-//
-//        return bitmap
-//    }
-}
+)

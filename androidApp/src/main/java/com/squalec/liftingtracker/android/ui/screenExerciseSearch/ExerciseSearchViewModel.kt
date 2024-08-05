@@ -5,17 +5,18 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.StateFlow
 import com.squalec.liftingtracker.appdatabase.DBFactory
 import com.squalec.liftingtracker.appdatabase.models.ExerciseDetails
-import com.squalec.workoutmodule.data.repositories.ExerciseDetailsRepositoryImpl
+import com.squalec.liftingtracker.appdatabase.repositories.ExerciseDetailsRepository
+import com.squalec.liftingtracker.appdatabase.repositories.ExerciseDetailsRepositoryImpl
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 
-class ExerciseSearchViewModel : ViewModel() {
+class ExerciseSearchViewModel (private val exerciseDetailsRepository: ExerciseDetailsRepository) : ViewModel() {
 
     private val _state = MutableStateFlow(ExerciseSearchState())
-    val state: StateFlow<ExerciseSearchState> = _state
+    val state: StateFlow<ExerciseSearchState> get()  = _state
 
     init {
         intent(ExerciseSearchIntent.GetAllMuscleNames)
@@ -35,9 +36,8 @@ class ExerciseSearchViewModel : ViewModel() {
                 isExerciseLoading = true
             )
         }
-        val db = DBFactory.createDatabase()
         viewModelScope.launch {
-            val muscleNames = ExerciseDetailsRepositoryImpl(db.exerciseDao()).muscleNames()
+            val muscleNames = exerciseDetailsRepository.muscleNames()
             Timber.d("Muscle names: $muscleNames")
             _state.update {
                 it.copy(
@@ -64,10 +64,9 @@ class ExerciseSearchViewModel : ViewModel() {
             )
         }
 
-        val db = DBFactory.createDatabase()
         viewModelScope.launch {
-            val exercises = db.exerciseDao().searchWithFilters(
-                searchText?:"",
+            val exercises = exerciseDetailsRepository.searchExercisesWithFilters(
+                searchText,
                 muscle?: emptyList(),
                 equipment?: "",
                 level?: "",
@@ -75,7 +74,7 @@ class ExerciseSearchViewModel : ViewModel() {
                 mechanic?: "",
                 category?: ""
             )
-//            val exercises = db.exerciseDao().searchExercises(searchText)
+
             _state.update {
                 it.copy(
                     exercises = exercises

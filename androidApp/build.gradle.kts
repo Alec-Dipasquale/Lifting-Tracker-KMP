@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.androidx.compose.material)
 
     debugImplementation(libs.compose.ui.tooling)
+    implementation(libs.koin.androidx.compose)
 
 
 

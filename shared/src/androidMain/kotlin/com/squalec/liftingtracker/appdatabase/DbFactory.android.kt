@@ -3,11 +3,15 @@ package com.squalec.liftingtracker.appdatabase
 import android.content.Context
 import android.util.Log
 import androidx.room.Room
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import kotlinx.coroutines.Dispatchers
+import org.koin.core.component.KoinComponent
 import org.koin.java.KoinJavaComponent.getKoin
 
-actual object DBFactory {
+
+actual object DBFactory : KoinComponent {
 
     @Volatile
     private var INSTANCE: AppDatabase? = null
@@ -18,8 +22,9 @@ actual object DBFactory {
             val instance = Room.databaseBuilder(
                 context.applicationContext,
                 AppDatabase::class.java,
-                "exercise-db"
-            ).build()
+                dbFileName
+            )
+                .build()
             INSTANCE = instance
             instance
         }
@@ -29,9 +34,10 @@ actual object DBFactory {
         val context: Context = getKoin().get()
         val jsonString = uploadJsonToDatabase(context, "exercises.json")
         val exercises = parseExercises(jsonString)
-        Log.d("[Database123]", "Exercises: $exercises")
-        val db = DBFactory.createDatabase()
+        Logs().log("Adding exercises to database")
+        val db = createDatabase()
         db.exerciseDao().insertExercises(*exercises.toTypedArray())
+        Logs().log("Exercises added to database")
     }
 
     private fun uploadJsonToDatabase(context: Context, fileName: String): String {

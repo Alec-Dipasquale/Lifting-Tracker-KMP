@@ -9,14 +9,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.squalec.liftingtracker.appdatabase.DBFactory
 import com.squalec.liftingtracker.appdatabase.models.ExerciseDetails
-import com.squalec.workoutmodule.data.repositories.ExerciseDetailsRepositoryImpl
+import com.squalec.liftingtracker.appdatabase.repositories.ExerciseDetailsRepositoryImpl
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.java.KoinJavaComponent.getKoin
 import java.io.IOException
 
-class ExerciseDetailsViewModel : ViewModel() {
+class ExerciseDetailsViewModel(private val exerciseDetailsRepositoryImpl: ExerciseDetailsRepositoryImpl): ViewModel() {
     val _state = MutableStateFlow(ExerciseDetailsState())
     val state: MutableStateFlow<ExerciseDetailsState> = _state
 

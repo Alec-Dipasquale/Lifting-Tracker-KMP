@@ -1,11 +1,10 @@
-package com.squalec.workoutmodule.data.repositories
+package com.squalec.liftingtracker.appdatabase.repositories
 
 import ExerciseDetailDao
 import com.squalec.liftingtracker.appdatabase.Logs
 import com.squalec.liftingtracker.appdatabase.models.ExerciseDetails
-import org.koin.core.logger.Logger
 
-internal interface ExerciseDetailsRepository {
+interface ExerciseDetailsRepository{
     suspend fun getAllExerciseDetails(): List<ExerciseDetails>
 
     suspend fun insertAllExerciseDetails(exerciseDetails: List<ExerciseDetails>)
@@ -31,6 +30,7 @@ internal interface ExerciseDetailsRepository {
 class ExerciseDetailsRepositoryImpl(
     private val exerciseDetailsDao: ExerciseDetailDao
 ) : ExerciseDetailsRepository {
+
     override suspend fun getAllExerciseDetails(): List<ExerciseDetails> {
         return exerciseDetailsDao.getAllExercises()
     }
