@@ -45,7 +45,7 @@ fun HomeScreen(navController: NavController) {
                     .padding(4.dp)
                     .align(Alignment.Center)
                     .clickable {
-                        navController.navigate(Destination.WorkoutSession)
+                        navController.navigate(Destination.WorkoutSession(date = null))
                     },
                 contentAlignment = Alignment.Center) {
                 Text(

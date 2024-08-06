@@ -1,7 +1,7 @@
 package com.squalec.liftingtracker.utils
 
 expect class CustomDate(utcDate: String) {
-    fun defaultFormatUtcDate(): String
-    fun formatUtcDateTime(): String
+    fun defaultFormat(): String
+    fun defaultFormatWithHours(): String
     fun formatUtcTime(): String
 }

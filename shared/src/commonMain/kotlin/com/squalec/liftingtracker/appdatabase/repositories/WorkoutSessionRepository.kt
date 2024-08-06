@@ -6,8 +6,8 @@ import com.squalec.liftingtracker.appdatabase.dao.UserWorkoutSessionDao
 import com.squalec.liftingtracker.appdatabase.models.UserWorkoutSession
 import com.squalec.liftingtracker.utils.CustomDate
 
-internal interface WorkoutSessionRepository {
-    suspend fun loadWorkoutSessionByDate(date: CustomDate): UserWorkoutSession
+interface WorkoutSessionRepository {
+    suspend fun getWorkoutSessionByDate(date: CustomDate): UserWorkoutSession
     suspend fun getWorkoutSessionId(date: CustomDate): Long
     suspend fun saveWorkoutSession()
     suspend fun addExerciseToWorkoutSession()
@@ -21,14 +21,14 @@ class WorkoutSessionRepositoryImpl(
     private val userExerciseDao: UserExerciseDao,
     private val userSetDao: UserSetDao
 ) : WorkoutSessionRepository {
-    override suspend fun loadWorkoutSessionByDate(date: CustomDate): UserWorkoutSession {
-        return userWorkoutSessionDao.getWorkoutSessionByDate(date.defaultFormatUtcDate())
+    override suspend fun getWorkoutSessionByDate(date: CustomDate): UserWorkoutSession {
+        return userWorkoutSessionDao.getWorkoutSessionByDate(date.defaultFormat())
     }
 
     override suspend fun getWorkoutSessionId(date: CustomDate): Long {
         return userWorkoutSessionDao.insertWorkoutSession(
             UserWorkoutSession(
-                date = date.defaultFormatUtcDate(),
+                date = date.defaultFormat(),
                 caloriesBurned = 0,
                 duration = 0,
             )

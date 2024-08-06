@@ -19,6 +19,6 @@ sealed class Destination {
 
     @Serializable
     data class WorkoutSession(
-        val date: String
+        val date: String? = null
     )
 }

@@ -26,7 +26,6 @@ interface ExerciseDetailsRepository{
     suspend  fun getExerciseDetails(id: String): ExerciseDetails?
 
 }
-// todo koin injection for dao
 class ExerciseDetailsRepositoryImpl(
     private val exerciseDetailsDao: ExerciseDetailDao
 ) : ExerciseDetailsRepository {

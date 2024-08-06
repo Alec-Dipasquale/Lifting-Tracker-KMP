@@ -1,11 +1,11 @@
 package com.squalec.liftingtracker.utils
 
 actual class CustomDate actual constructor(utcDate: String) {
-    actual fun defaultFormatUtcDate(): String {
+    actual fun defaultFormat(): String {
         TODO("Not yet implemented")
     }
 
-    actual fun formatUtcDateTime(): String {
+    actual fun defaultFormatWithHours(): String {
         TODO("Not yet implemented")
     }
 
