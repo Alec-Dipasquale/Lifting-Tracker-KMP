@@ -59,11 +59,7 @@ fun NavGraph(isLoading: Boolean) {
             val dateParam = parameters.arguments?.getString("date")
             val customDate: CustomDate
             if(dateParam == null) {
-
-                val currentDateTime = dateParam?: LocalDateTime.now()
-                val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-                val formattedDate = currentDateTime.format(formatter)
-                customDate = CustomDate(formattedDate)
+                customDate = CustomDate.now()
             } else {
                 customDate = CustomDate(dateParam)
             }

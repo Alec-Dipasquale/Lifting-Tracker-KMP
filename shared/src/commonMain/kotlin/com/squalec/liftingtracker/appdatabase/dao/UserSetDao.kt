@@ -12,5 +12,5 @@ interface UserSetDao {
     @Query("SELECT * FROM user_sets")
     suspend fun getUserExerciseSets(): List<UserSet>
     @Query("SELECT * FROM user_sets WHERE exercise_id = :exerciseId")
-    suspend fun getUserExerciseSetsForWorkout(exerciseId: Int): List<UserSet>
+    suspend fun getUserExerciseSetsForWorkout(exerciseId: String): List<UserSet>
 }

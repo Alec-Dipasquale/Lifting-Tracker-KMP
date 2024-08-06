@@ -23,6 +23,6 @@ val databaseModule = module {
         single<UserSetDao>{ get<AppDatabase>().userSetDao() }
 
         single<ExerciseDetailsRepository> { ExerciseDetailsRepositoryImpl(get()) }
-        single<WorkoutSessionRepository> { WorkoutSessionRepositoryImpl(get(), get(), get()) }
+        single<WorkoutSessionRepository> { WorkoutSessionRepositoryImpl(get(), get(), get(), get()) }
 
 }

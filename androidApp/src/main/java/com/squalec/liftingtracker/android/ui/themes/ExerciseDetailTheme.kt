@@ -23,36 +23,13 @@ fun ExerciseDetailTheme(
 ) {
 
     val colors = if (darkTheme) {
-        darkColorScheme(
-            primary = Color(0xFF1D00C7),
-            secondary = Color(0xFFF15A25),
-            tertiary = Color(0xFF3700B3),
-            background = Color(0xFF121212),
-            surface = Color(0xFF121212),
-        )
+        darkColorScheme
     } else {
-        lightColorScheme(
-            primary = Color(0xFF0000FF),
-            secondary = Color(0xFFFF9742),
-            tertiary = Color(0xFF3700B3),
-            background = Color(0xFFE0E0E0),
-            surface = Color(0xFFE0E0E0),
-
-        )
+        lightColorScheme
     }
-    val typography = Typography(
-        bodyMedium = TextStyle(
-            fontFamily = FontFamily.Default,
-            fontWeight = FontWeight.Normal,
-            fontSize = 16.sp,
-            color= colors.onSurface
-        )
-    )
-    val shapes = Shapes(
-        small = RoundedCornerShape(4.dp),
-        medium = RoundedCornerShape(4.dp),
-        large = RoundedCornerShape(0.dp)
-    )
+    val typography = defaultTypography
+
+    val shapes = defaultShape
 
     MaterialTheme(
         colorScheme = colors,

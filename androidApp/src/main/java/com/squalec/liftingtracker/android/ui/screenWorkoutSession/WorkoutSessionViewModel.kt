@@ -2,14 +2,10 @@ package com.squalec.liftingtracker.android.ui.screenWorkoutSession
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.squalec.liftingtracker.android.ui.navigation.Destination
-import com.squalec.liftingtracker.appdatabase.DBFactory
 import com.squalec.liftingtracker.appdatabase.models.UserExercise
 import com.squalec.liftingtracker.appdatabase.models.UserSet
-import com.squalec.liftingtracker.appdatabase.models.UserWorkoutSession
-import com.squalec.liftingtracker.appdatabase.repositories.ExerciseDetailsRepository
+import com.squalec.liftingtracker.appdatabase.repositories.WorkoutSessionModel
 import com.squalec.liftingtracker.appdatabase.repositories.WorkoutSessionRepository
-import com.squalec.liftingtracker.appdatabase.repositories.WorkoutSessionRepositoryImpl
 import com.squalec.liftingtracker.utils.CustomDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +15,7 @@ import kotlinx.coroutines.launch
 
 class WorkoutSessionViewModel (private val exerciseDetailsRepository: WorkoutSessionRepository): ViewModel(){
 
-    private val _state = MutableStateFlow(WorkoutSessionState(CustomDate(""), null))
+    private val _state = MutableStateFlow(WorkoutSessionState(CustomDate.now(), null))
     val state: StateFlow<WorkoutSessionState> = _state
 
     fun handleEvent(event: WorkoutSessionEvent){
@@ -41,7 +37,8 @@ class WorkoutSessionViewModel (private val exerciseDetailsRepository: WorkoutSes
     private fun changeDate(date: CustomDate){
         _state.update {
             WorkoutSessionState(
-                date,)
+                date,
+                )
         }
     }
 
@@ -50,7 +47,7 @@ class WorkoutSessionViewModel (private val exerciseDetailsRepository: WorkoutSes
             val result = exerciseDetailsRepository.getWorkoutSessionByDate(date)
             _state.update {
                 it.copy(
-                    workoutSession = result
+                    workoutSessionModel = result
                 )
             }
         }
@@ -59,7 +56,7 @@ class WorkoutSessionViewModel (private val exerciseDetailsRepository: WorkoutSes
 
 data class WorkoutSessionState(
     val date: CustomDate,
-    val workoutSession: UserWorkoutSession? = null
+    val workoutSessionModel: WorkoutSessionModel? = null
 )
 
 sealed class WorkoutSessionEvent {
