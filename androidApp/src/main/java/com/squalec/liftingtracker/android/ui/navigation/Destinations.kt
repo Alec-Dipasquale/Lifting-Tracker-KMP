@@ -10,7 +10,9 @@ sealed class Destination {
     object Home
 
     @Serializable
-    object ExerciseSearch
+    data class ExerciseSearch(
+        val isOnClickExerciseEnabled: Boolean = false
+    )
 
     @Serializable
     data class ExerciseDetail(
@@ -19,6 +21,7 @@ sealed class Destination {
 
     @Serializable
     data class WorkoutSession(
-        val date: String? = null
+        val date: String? = null,
+        val addedExerciseId: String? = null
     )
 }

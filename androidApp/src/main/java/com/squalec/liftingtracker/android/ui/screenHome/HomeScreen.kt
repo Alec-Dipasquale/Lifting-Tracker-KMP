@@ -24,6 +24,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.squalec.liftingtracker.android.ui.navigation.Destination
 import com.squalec.liftingtracker.android.ui.navigation.TabDestinations
+import com.squalec.liftingtracker.appdatabase.WorkoutSessionManager
+import com.squalec.liftingtracker.utils.CustomDate
 
 @Composable
 fun HomeScreen(navController: NavController) {
@@ -45,7 +47,9 @@ fun HomeScreen(navController: NavController) {
                     .padding(4.dp)
                     .align(Alignment.Center)
                     .clickable {
-                        navController.navigate(Destination.WorkoutSession(date = null))
+                        val date = if(WorkoutSessionManager.workoutState.value.isWorkoutInProgress)
+                            null else CustomDate.now().utcDate
+                        navController.navigate(Destination.WorkoutSession(date = date))
                     },
                 contentAlignment = Alignment.Center) {
                 Text(

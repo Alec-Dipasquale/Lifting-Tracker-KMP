@@ -19,7 +19,7 @@ val lightColorScheme = lightColorScheme(
     secondary = Color(0xFFFF9742),
     tertiary = Color(0xFF3700B3),
     background = Color(0xFFE0E0E0),
-    surface = Color(0xFFE0E0E0),
+    surface = Color(0xFF969595),
     onSurface = Color(0xFF000000),
     onBackground = Color(0xFF000000),
 )

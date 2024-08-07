@@ -3,6 +3,7 @@ package com.squalec.liftingtracker.di
 import ExerciseDetailDao
 import com.squalec.liftingtracker.appdatabase.AppDatabase
 import com.squalec.liftingtracker.appdatabase.DBFactory
+import com.squalec.liftingtracker.appdatabase.WorkoutSessionManager
 import com.squalec.liftingtracker.appdatabase.dao.UserExerciseDao
 import com.squalec.liftingtracker.appdatabase.dao.UserSetDao
 import com.squalec.liftingtracker.appdatabase.dao.UserWorkoutSessionDao

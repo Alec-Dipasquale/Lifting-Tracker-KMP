@@ -39,10 +39,10 @@ actual class CustomDate actual constructor(val utcDate: String) {
         return outputFormat.format(parsedDate!!)
     }
 
-    companion object {
+    actual companion object {
         const val INIT_FORMAT = "yyyy-MM-dd:HH:mm:ss"
 
-        fun now(): CustomDate {
+        actual fun now(): CustomDate {
             val dateFormat = SimpleDateFormat(INIT_FORMAT, Locale.getDefault())
             val currentDate = dateFormat.format(Date())
             return CustomDate(currentDate)

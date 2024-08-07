@@ -13,7 +13,7 @@ fun androidModule() = module {
     viewModel {
         ExerciseSearchViewModel(get())
     }
-    viewModel{
-        WorkoutSessionViewModel(get())
+    viewModel {
+        WorkoutSessionViewModel(get(), get())
     }
 }

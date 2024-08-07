@@ -49,7 +49,8 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ExerciseSearchScreen(
-    navController: NavController
+    navController: NavController,
+    isOnClickExerciseEnabled: Boolean
 ) {
     val viewModel: ExerciseSearchViewModel = koinViewModel()
     val state by viewModel.state.collectAsState()
@@ -118,6 +119,15 @@ fun ExerciseSearchScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .clickable {
+                            if(isOnClickExerciseEnabled){
+                                navController.navigate(Destination.WorkoutSession(addedExerciseId = exercise.id)){
+                                    popUpTo(Destination.WorkoutSession()){
+                                        inclusive = true
+                                    }
+                                }
+                            }
+                        }
                         .padding(8.dp)
                         .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(8.dp))
                         .padding(16.dp)

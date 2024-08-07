@@ -7,11 +7,12 @@ import com.squalec.liftingtracker.appdatabase.dao.UserWorkoutSessionDao
 import com.squalec.liftingtracker.appdatabase.models.ExerciseDetails
 import com.squalec.liftingtracker.appdatabase.models.UserWorkoutSession
 import com.squalec.liftingtracker.utils.CustomDate
+import kotlin.time.Duration
 
 interface WorkoutSessionRepository {
     suspend fun getWorkoutSessionByDate(date: CustomDate): WorkoutSessionModel
     suspend fun getWorkoutSessionId(date: CustomDate): Long
-    suspend fun saveWorkoutSession()
+    suspend fun saveWorkoutSession(workoutSessionModel: WorkoutSessionModel)
     suspend fun addExerciseToWorkoutSession()
     suspend fun removeExerciseFromWorkoutSession()
     suspend fun addSetToExercise()
@@ -38,8 +39,14 @@ class WorkoutSessionRepositoryImpl(
         )
     }
 
-    override suspend fun saveWorkoutSession() {
-        // Save workout session
+    override suspend fun saveWorkoutSession(workoutSessionModel: WorkoutSessionModel) {
+        val workoutSessionId = userWorkoutSessionDao.insertWorkoutSession(
+            UserWorkoutSession(
+                date = workoutSessionModel.date.defaultFormat(),
+                caloriesBurned = workoutSessionModel.caloriesBurned,
+                duration = workoutSessionModel.duration,
+            )
+        )
     }
 
     override suspend fun addExerciseToWorkoutSession() {
@@ -85,17 +92,19 @@ suspend fun UserWorkoutSession.toWorkoutSessionModel(
 
 data class WorkoutSessionModel(
     val date: CustomDate,
-    val exercises: List<ExerciseSessionModel>?,
+    val exercises: List<ExerciseSessionModel> = listOf(ExerciseSessionModel(exercise = null, orderPosition = 0)),
+    val duration: Long = 0,
+    val caloriesBurned: Int = 0,
 )
 
 data class ExerciseSessionModel(
     val exercise: ExerciseDetails?,
     val orderPosition: Int,
-    val sets: List<SetSessionModel>?,
+    val sets: List<SetSessionModel> = listOf(SetSessionModel()),
 )
 
 data class SetSessionModel(
-    val orderPosition: Int,
-    val weight: Float,
-    val reps: Int,
+    val orderPosition: Int = 0,
+    val weight: Float? = null,
+    val reps: Int? = null,
 )

@@ -45,6 +45,7 @@ kotlin {
             implementation(libs.kotlinx.serialization)
             implementation(libs.koin.core)
             implementation(libs.koin.test)
+            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
 
             //put your multiplatform dependencies here
         }

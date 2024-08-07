@@ -5,4 +5,7 @@ expect class CustomDate(utcDate: String) {
     fun defaultFormatWithHours(): String
     fun formatUtcTime(): String
     fun displayFormat(): String
+    companion object{
+        fun now(): CustomDate
+    }
 }
