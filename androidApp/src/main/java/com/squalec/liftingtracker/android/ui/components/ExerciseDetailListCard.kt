@@ -14,15 +14,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.Text
+import com.squalec.liftingtracker.android.ui.utilities.ShadowTypes
+import com.squalec.liftingtracker.android.ui.utilities.customShadow
 
 @Composable
 fun ExerciseDetailListCard(title: String, content: List<String>) {
     Card(
         shape = RoundedCornerShape(8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
+            .customShadow(ShadowTypes.medium)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
@@ -36,13 +39,15 @@ fun ExerciseDetailListCard(title: String, content: List<String>) {
             if (content.isEmpty())
                 Text(
                     text = "No $title Listed",
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
             content.forEach {
                 Text(
                     text = it,
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
         }

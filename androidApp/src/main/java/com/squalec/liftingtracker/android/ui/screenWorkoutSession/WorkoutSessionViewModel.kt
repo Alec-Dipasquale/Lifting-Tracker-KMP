@@ -3,7 +3,6 @@ package com.squalec.liftingtracker.android.ui.screenWorkoutSession
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.squalec.liftingtracker.appdatabase.WorkoutSessionManager
-import com.squalec.liftingtracker.appdatabase.models.UserSet
 import com.squalec.liftingtracker.appdatabase.repositories.ExerciseDetailsRepository
 import com.squalec.liftingtracker.appdatabase.repositories.ExerciseSessionModel
 import com.squalec.liftingtracker.appdatabase.repositories.SetSessionModel
@@ -65,7 +64,69 @@ class WorkoutSessionViewModel(
             is WorkoutSessionEvent.OnAddSet -> {
                 onAddSet()
             }
-            is WorkoutSessionEvent.OnRemoveSet -> TODO()
+            is WorkoutSessionEvent.OnRemoveSet -> {
+
+            }
+            is WorkoutSessionEvent.ChangeSetWeight -> {
+                onChangeSetWeight(event.exercise, event.set, event.weight)
+            }
+            is WorkoutSessionEvent.ChangeSetReps -> {
+                onChangeSetReps(event.exercise, event.set, event.reps)
+            }
+        }
+    }
+
+    private fun onChangeSetReps(exercise: ExerciseSessionModel, set: SetSessionModel, reps: Int) {
+        val updatedExercise = exercise.copy(
+            sets = exercise.sets.map {
+                if (it == set) {
+                    it.copy(
+                        reps = reps
+                    )
+                } else {
+                    it
+                }
+            }
+        )
+        _state.update {
+            it.copy(
+                workoutSessionModel = it.workoutSessionModel?.copy(
+                    exercises = it.workoutSessionModel.exercises.map {
+                        if (it == exercise) {
+                            updatedExercise
+                        } else {
+                            it
+                        }
+                    }
+                )
+            )
+        }
+    }
+
+    private fun onChangeSetWeight(exercise: ExerciseSessionModel, set: SetSessionModel, weight: Float) {
+        val updatedExercise = exercise.copy(
+            sets = exercise.sets.map {
+                if (it == set) {
+                    it.copy(
+                        weight = weight
+                    )
+                } else {
+                    it
+                }
+            }
+        )
+        _state.update {
+            it.copy(
+                workoutSessionModel = it.workoutSessionModel?.copy(
+                    exercises = it.workoutSessionModel.exercises.map {
+                        if (it == exercise) {
+                            updatedExercise
+                        } else {
+                            it
+                        }
+                    }
+                )
+            )
         }
     }
 
@@ -87,16 +148,16 @@ class WorkoutSessionViewModel(
         val newSet = lastSet.copy(
             orderPosition = lastExercise.sets.size
         )
-        _state.update {
-            it.copy(
+        _state.update { workoutSessionState ->
+            workoutSessionState.copy(
                 workoutSessionModel = workoutSession.copy(
-                    exercises = workoutSession.exercises.map {
-                        if (it == lastExercise) {
-                            it.copy(
-                                sets = it.sets.plus(newSet)
+                    exercises = workoutSession.exercises.map { exerciseSessionModel ->
+                        if (exerciseSessionModel == lastExercise) {
+                            exerciseSessionModel.copy(
+                                sets = exerciseSessionModel.sets.plus(newSet)
                             )
                         } else {
-                            it
+                            exerciseSessionModel
                         }
                     }
                 )
@@ -193,4 +254,6 @@ sealed class WorkoutSessionEvent {
     object OnFinishedWorkout : WorkoutSessionEvent()
     data class OnAddSet(val set: SetSessionModel) : WorkoutSessionEvent()
     data class OnUpdateWorkout(val workoutSessionModel: WorkoutSessionModel) : WorkoutSessionEvent()
+    data class ChangeSetWeight(val exercise: ExerciseSessionModel, val set: SetSessionModel, val weight: Float) : WorkoutSessionEvent()
+    data class ChangeSetReps(val exercise: ExerciseSessionModel, val set: SetSessionModel, val reps: Int) : WorkoutSessionEvent()
 }

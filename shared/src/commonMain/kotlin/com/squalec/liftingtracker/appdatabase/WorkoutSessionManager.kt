@@ -73,7 +73,7 @@ data class WorkoutSessionManagedState(
         duration = 0,
         exercises = emptyList()
     ),
-    val isWorkoutInProgress: Boolean,
+    val isWorkoutInProgress: Boolean = false,
     val date: CustomDate = CustomDate.now()
 )
 

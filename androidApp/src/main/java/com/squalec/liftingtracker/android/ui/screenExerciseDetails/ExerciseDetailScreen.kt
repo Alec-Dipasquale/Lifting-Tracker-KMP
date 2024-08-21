@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -25,10 +26,11 @@ import androidx.wear.compose.material.Text
 import com.squalec.liftingtracker.android.ui.components.ExerciseDetailCard
 import com.squalec.liftingtracker.android.ui.components.ExerciseDetailListCard
 import com.squalec.liftingtracker.android.ui.components.ImageCarousel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ExerciseDetailScreen(
-    viewModel: ExerciseDetailsViewModel = viewModel(),
+    viewModel: ExerciseDetailsViewModel = koinViewModel(),
     exerciseId: String,
     navController: NavHostController
 ) {
@@ -50,8 +52,10 @@ fun ExerciseDetailScreen(
                     text = state.exerciseDetails?.name ?: "No Name",
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
+                Divider(color = MaterialTheme.colorScheme.onBackground, thickness = 1.dp)
                 Spacer(modifier = Modifier.height(16.dp))
                 ImageCarousel(state.exerciseImageIds)
                 Spacer(modifier = Modifier.height(16.dp))

@@ -9,16 +9,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.squalec.liftingtracker.appdatabase.DBFactory
 import com.squalec.liftingtracker.appdatabase.models.ExerciseDetails
+import com.squalec.liftingtracker.appdatabase.repositories.ExerciseDetailsRepository
 import com.squalec.liftingtracker.appdatabase.repositories.ExerciseDetailsRepositoryImpl
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.java.KoinJavaComponent.getKoin
 import java.io.IOException
 
-class ExerciseDetailsViewModel(private val exerciseDetailsRepositoryImpl: ExerciseDetailsRepositoryImpl): ViewModel() {
-    val _state = MutableStateFlow(ExerciseDetailsState())
-    val state: MutableStateFlow<ExerciseDetailsState> = _state
+class ExerciseDetailsViewModel(private val exerciseDetailsRepository: ExerciseDetailsRepository): ViewModel() {
+
+    private val _state = MutableStateFlow(ExerciseDetailsState())
+    val state: StateFlow<ExerciseDetailsState> get() = _state
 
     fun intent(intent: ExerciseDetailsIntent) {
         when (intent) {
@@ -28,9 +31,7 @@ class ExerciseDetailsViewModel(private val exerciseDetailsRepositoryImpl: Exerci
 
     private fun getExerciseDetails(id: String) {
         viewModelScope.launch {
-            val db = DBFactory.createDatabase()
-            val exerciseDetails =
-                ExerciseDetailsRepositoryImpl(db.exerciseDao()).getExerciseDetails(id)
+            val exerciseDetails = exerciseDetailsRepository.getExerciseDetails(id)
             val exerciseImageIds = exerciseDetails?.getImageBitmap()
             _state.update {
                 ExerciseDetailsState(
@@ -63,11 +64,6 @@ fun ExerciseDetails.getImageBitmap(): List<ImageBitmap>? {
     }
     return listOfImageBitmaps
 }
-
-//fun ExerciseDetails.fakeImage():Bitmap? {
-//    val context: Context = getKoin().get()
-//    return getExerciseImageFromRaw(context, "3_4_Sit-Up", 0)
-//}
 
 
 fun getExerciseImageFromRaw(context: Context, exercisePath:String): Bitmap? {
