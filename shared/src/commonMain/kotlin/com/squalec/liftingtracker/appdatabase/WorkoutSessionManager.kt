@@ -10,11 +10,13 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 
 object WorkoutSessionManager {
+
     private val _workoutState = MutableStateFlow(
         WorkoutSessionManagedState(
             isWorkoutInProgress = false
         )
     )
+
     val workoutState: StateFlow<WorkoutSessionManagedState> get() = _workoutState
 
     private val _workoutStartTime = MutableStateFlow<Instant?>(null)

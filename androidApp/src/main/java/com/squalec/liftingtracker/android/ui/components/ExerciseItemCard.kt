@@ -19,11 +19,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.squalec.liftingtracker.android.ui.screenWorkoutSession.WorkoutSessionEvent
 import com.squalec.liftingtracker.android.ui.themes.WorkoutSessionTheme
+import com.squalec.liftingtracker.android.ui.utilities.clearAllFocusOnTap
 import com.squalec.liftingtracker.android.ui.utilities.customShadow
 import com.squalec.liftingtracker.appdatabase.repositories.ExerciseSessionModel
 import com.squalec.liftingtracker.appdatabase.repositories.SetSessionModel
@@ -34,6 +36,8 @@ fun ExerciseItemCard(
     onIntent: (WorkoutSessionEvent) -> Unit,
 ) {
 
+    val focusManager = LocalFocusManager.current
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -41,6 +45,7 @@ fun ExerciseItemCard(
     ) {
         Card(
             modifier = Modifier
+                .clearAllFocusOnTap(focusManager)
                 .fillMaxWidth()
                 .padding(16.dp)
                 .customShadow(),

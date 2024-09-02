@@ -36,9 +36,11 @@ fun ExerciseDetailScreen(
 ) {
 
     val state by viewModel.state.collectAsState()
+
     LaunchedEffect(key1 = Unit) {
         viewModel.intent(ExerciseDetailsIntent.GetExercise(exerciseId))
     }
+
     LazyColumn(
         modifier = Modifier
             .scrollable(orientation = Orientation.Vertical, state = rememberScrollState())

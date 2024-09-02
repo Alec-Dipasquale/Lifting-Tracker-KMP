@@ -3,8 +3,10 @@ package com.squalec.liftingtracker.android.ui.screenWorkoutSession
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -18,6 +20,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -25,6 +28,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.squalec.liftingtracker.android.ui.components.ExerciseItemCard
 import com.squalec.liftingtracker.android.ui.components.StopWorkoutButton
+import com.squalec.liftingtracker.android.ui.utilities.clearAllFocusOnTap
 import com.squalec.liftingtracker.android.ui.navigation.Destination
 import com.squalec.liftingtracker.android.ui.themes.WorkoutSessionTheme
 import com.squalec.liftingtracker.appdatabase.WorkoutSessionManagedState
@@ -87,7 +91,10 @@ fun WorkoutSessionLazyColumn(
     onIntent: (WorkoutSessionEvent) -> Unit,
     navController: NavController
 ) {
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
+    val focusManager = LocalFocusManager.current
+    LazyColumn(modifier = Modifier
+        .clearAllFocusOnTap(focusManager)
+        .fillMaxSize()) {
         // Display workout session
         item {
             DateTitle(
@@ -97,11 +104,13 @@ fun WorkoutSessionLazyColumn(
         state.workoutSessionModel?.exercises?.let { exercises ->
             item {
                 StopWorkoutButton(
+                    modifier = Modifier.clearAllFocusOnTap(focusManager).fillMaxWidth(),
                     exercises = exercises,
                     navController = navController,
                     onIntent = {
                         onIntent(it)
-                    }
+                    },
+                    isHidden = state.isFinished
                 )
             }
 
@@ -121,6 +130,10 @@ fun WorkoutSessionLazyColumn(
                     navController = navController
                 )
             }
+
+        item {
+            Spacer(modifier = Modifier.height(100.dp))
+        }
     }
 }
 

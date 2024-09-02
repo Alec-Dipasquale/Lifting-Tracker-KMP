@@ -14,21 +14,23 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.squalec.liftingtracker.android.ui.navigation.Destination
 import com.squalec.liftingtracker.android.ui.screenWorkoutSession.WorkoutSessionEvent
-import com.squalec.liftingtracker.android.ui.screenWorkoutSession.WorkoutSessionViewModel
 import com.squalec.liftingtracker.appdatabase.WorkoutSessionManager
 import com.squalec.liftingtracker.appdatabase.repositories.ExerciseSessionModel
 
 @Composable
 fun StopWorkoutButton(
+    modifier: Modifier,
     exercises: List<ExerciseSessionModel>,
     onIntent: (WorkoutSessionEvent) -> Unit,
     navController: NavController,
+    isHidden: Boolean = false,
 ) {
+    if(isHidden) return
 
     val isExercisesEmpty = exercises.isNullOrEmpty()
     val buttonText = if (!isExercisesEmpty) "Finish Workout" else "Cancel Workout"
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(16.dp)
     ) {
