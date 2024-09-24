@@ -22,7 +22,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalTextInputService
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.getSelectedText
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.squalec.liftingtracker.android.ui.screenWorkoutSession.WorkoutSessionEvent
@@ -36,16 +40,17 @@ fun SetRowItem(
     modifier: Modifier = Modifier,
     set: SetSessionModel,
     exercise: ExerciseSessionModel,
-    onIntent: (WorkoutSessionEvent) -> Unit
+    onIntent: (WorkoutSessionEvent) -> Unit,
+    isFinished: Boolean
 ) {
 
     val focusManager = LocalFocusManager.current
 
     var weight by remember {
-        mutableStateOf(set.weight?.toString() ?: "")
+        mutableStateOf(set.weight?.toString() ?: "0.0")
     }
     var reps by remember {
-        mutableStateOf(set.reps?.toString() ?: "")
+        mutableStateOf(set.reps?.toString() ?: "0")
     }
 
     Box(modifier = modifier
@@ -62,52 +67,103 @@ fun SetRowItem(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(text = "${set.orderPosition + 1}")
-            TextField(
-                modifier = Modifier
-                    .width(90.dp)
-                    .clip(shape = RoundedCornerShape(4.dp))
-                    .onFocusChanged { focusState ->
-                        if (!focusState.isFocused) {
-                            onIntent(
-                                WorkoutSessionEvent.ChangeSetWeight(
-                                    exercise,
-                                    set.orderPosition,
-                                    weight.toFloatOrNull() ?: 0f
-                                )
-                            )
-                        }
-                    },
-                value = weight,
-                onValueChange = { value ->
+            EditableSetTextField(
+                text = weight,
+                isFinished = isFinished,
+                onRepsChange = { value ->
                     weight = value
+                               },
+                onIntent = { position, text ->
+                    onIntent(WorkoutSessionEvent.ChangeSetWeight(exercise, position, text.toFloat()))
                 },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                exercise = exercise,
+                set = set
             )
             Text(text = "x")
-            TextField(
-                modifier = Modifier
-                    .width(90.dp)
-                    .clip(shape = RoundedCornerShape(4.dp))
-                    .onFocusChanged { focusState ->
-                        if (!focusState.isFocused) {
-                            onIntent(
-                                WorkoutSessionEvent.ChangeSetReps(
-                                    exercise,
-                                    set.orderPosition,
-                                    reps.toIntOrNull() ?: 0
-                                )
-                            )
-                        }
-                    },
-                value = reps,
-                onValueChange = { value ->
+
+            EditableSetTextField(
+                text = reps,
+                isFinished = isFinished,
+                onRepsChange = { value ->
                     reps = value
                 },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                onIntent = { position, text ->
+                    onIntent(WorkoutSessionEvent.ChangeSetReps(exercise, position, text.toInt()))
+                },
+                exercise = exercise,
+                set = set
             )
         }
     }
 }
+
+@Composable
+fun EditableSetTextField(
+    text: String,
+    isFinished: Boolean,
+    onRepsChange: (String) -> Unit,
+    onIntent: (position:Int, text:String) -> Unit,
+    exercise: ExerciseSessionModel, // Assuming this is your Exercise data class or type
+    set: SetSessionModel // Assuming this is your Set data class or type
+) {
+
+
+    var textFieldValue by remember { mutableStateOf(TextFieldValue(text)) }
+    var isFirstFocus by remember { mutableStateOf(false) }
+
+    if (isFinished) {
+        Text(
+            text = textFieldValue.text,
+            modifier = Modifier
+                .width(90.dp)
+                .clip(shape = RoundedCornerShape(4.dp)),
+            style = MaterialTheme.typography.bodyMedium // Adjust style as needed
+        )
+    } else {
+        TextField(
+            modifier = Modifier
+                .width(90.dp)
+                .clip(shape = RoundedCornerShape(4.dp))
+                .onFocusChanged { focusState ->
+                    if (!focusState.isFocused) {
+                        textFieldValue = textFieldValue.copy(
+                            selection = TextRange(0, 0)
+                        )
+                        onIntent(
+                            set.orderPosition, textFieldValue.text
+                        )
+                    } else{
+                        textFieldValue = textFieldValue.copy(
+                            selection = TextRange(0, textFieldValue.text.length)
+                        )
+                        isFirstFocus = true
+                    }
+                },
+            value = textFieldValue,
+            onValueChange = { newValue ->
+                if (isFirstFocus) {
+                    textFieldValue = newValue.copy(
+                        text = newValue.text,
+                        selection = TextRange(0, newValue.text.length)
+                    )
+                    isFirstFocus = false
+
+                } else {
+                    textFieldValue = newValue.copy(
+                        text = newValue.text,
+                        selection = newValue.selection
+                    )
+                    onIntent(
+                        set.orderPosition, newValue.text
+                    )
+                }
+                onRepsChange(newValue.text)
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+        )
+    }
+}
+
 
 @Preview
 @Composable
@@ -116,7 +172,8 @@ fun SetRowItemPreview() {
         SetRowItem(
             set = SetSessionModel(),
             exercise = ExerciseSessionModel(exercise = null, sets = emptyList(), orderPosition = 0),
-            onIntent = {}
+            onIntent = {},
+            isFinished = false
         )
     }
 }

@@ -34,6 +34,7 @@ import com.squalec.liftingtracker.appdatabase.repositories.SetSessionModel
 fun ExerciseItemCard(
     exercise: ExerciseSessionModel,
     onIntent: (WorkoutSessionEvent) -> Unit,
+    isFinished: Boolean,
 ) {
 
     val focusManager = LocalFocusManager.current
@@ -81,6 +82,7 @@ fun ExerciseItemCard(
                         SetRowItem(
                             modifier = Modifier.padding(vertical = 8.dp),
                             set = it,
+                            isFinished = isFinished,
                             exercise = exercise,
                             onIntent = {
                                 onIntent(it)
@@ -100,8 +102,9 @@ fun ExerciseItemCard(
                         onIntent(
                             WorkoutSessionEvent.OnAddSet(
                                 SetSessionModel(
-                                    orderPosition = exercise.sets.size
-                                )
+                                    orderPosition = exercise.sets.size,
+                                ),
+                                exerciseId = exercise.exercise?.id ?: error("Exercise id is null")
                             )
                         )
                     }) {
@@ -172,7 +175,8 @@ fun ExerciseItemCardPreview() {
                     ),
                     orderPosition = 0
                 ),
-                onIntent = {}
+                onIntent = {},
+                isFinished = false
             )
         }
     }

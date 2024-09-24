@@ -58,7 +58,7 @@ class WorkoutSessionViewModel(
             }
 
             is WorkoutSessionEvent.OnAddSet -> {
-                onAddSet()
+                onAddSet(event.set, event.exerciseId)
             }
             is WorkoutSessionEvent.OnRemoveSet -> {
 
@@ -148,18 +148,18 @@ class WorkoutSessionViewModel(
         }
     }
 
-    private fun onAddSet() {
+    private fun onAddSet(set: SetSessionModel, exerciseId: String){
         val workoutSession = _state.value.workoutSessionModel ?: return
-        val lastExercise = workoutSession.exercises.lastOrNull() ?: return
-        val lastSet = lastExercise.sets.lastOrNull() ?: return
+        val exercise = workoutSession.exercises.find { it.exercise?.id == exerciseId } ?: return
+        val lastSet = exercise.sets.lastOrNull() ?: return
         val newSet = lastSet.copy(
-            orderPosition = lastExercise.sets.size
+            orderPosition = exercise.sets.size
         )
         _state.update { workoutSessionState ->
             workoutSessionState.copy(
                 workoutSessionModel = workoutSession.copy(
                     exercises = workoutSession.exercises.map { exerciseSessionModel ->
-                        if (exerciseSessionModel == lastExercise) {
+                        if (exerciseSessionModel == exercise) {
                             exerciseSessionModel.copy(
                                 sets = exerciseSessionModel.sets.plus(newSet)
                             )
@@ -259,7 +259,7 @@ sealed class WorkoutSessionEvent {
     object OnRemoveExercise : WorkoutSessionEvent()
     object OnRemoveSet : WorkoutSessionEvent()
     object OnFinishedWorkout : WorkoutSessionEvent()
-    data class OnAddSet(val set: SetSessionModel) : WorkoutSessionEvent()
+    data class OnAddSet(val set: SetSessionModel, val exerciseId: String) : WorkoutSessionEvent()
     data class ChangeSetWeight(val exercise: ExerciseSessionModel, val position: Int, val weight: Float) : WorkoutSessionEvent()
     data class ChangeSetReps(val exercise: ExerciseSessionModel, val position: Int, val reps: Int) : WorkoutSessionEvent()
 }

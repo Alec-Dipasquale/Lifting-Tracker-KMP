@@ -116,6 +116,7 @@ fun WorkoutSessionLazyColumn(
 
             items(exercises) { exercise ->
                 ExerciseItemCard(
+                    isFinished = state.isFinished,
                     exercise = exercise,
                     onIntent = {
                         onIntent(it)
