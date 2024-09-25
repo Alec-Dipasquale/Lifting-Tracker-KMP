@@ -27,16 +27,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.squalec.liftingtracker.android.ui.LoadingScreen
+import com.squalec.liftingtracker.android.ui.screenCalendar.CalendarView
 import com.squalec.liftingtracker.android.ui.screenExerciseDetails.ExerciseDetailScreen
 import com.squalec.liftingtracker.android.ui.screenExerciseSearch.ExerciseSearchScreen
 import com.squalec.liftingtracker.android.ui.screenHome.HomeScreen
 import com.squalec.liftingtracker.android.ui.screenWorkoutSession.WorkoutSessionScreen
+import com.squalec.liftingtracker.android.ui.themes.CalendarViewTheme
 import com.squalec.liftingtracker.android.ui.themes.ExerciseDetailTheme
 import com.squalec.liftingtracker.android.ui.themes.HomeTheme
 import com.squalec.liftingtracker.android.ui.themes.SearchExercisesTheme
@@ -109,9 +112,16 @@ fun NavGraph(isLoading: Boolean) {
                     )
                 }
             }
+
+            composable<Destination.CalendarView> {
+                CalendarViewTheme {
+                    CalendarView()
+                }
+            }
         }
     }
 }
+
 @Composable
 fun WorkoutInProgressBar(
     isInWorkoutSession: Boolean,

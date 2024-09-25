@@ -1,5 +1,6 @@
 package com.squalec.liftingtracker.android
 
+import com.squalec.liftingtracker.android.ui.screenCalendar.CalendarViewModel
 import com.squalec.liftingtracker.android.ui.screenExerciseDetails.ExerciseDetailsViewModel
 import com.squalec.liftingtracker.android.ui.screenExerciseSearch.ExerciseSearchViewModel
 import com.squalec.liftingtracker.android.ui.screenWorkoutSession.WorkoutSessionViewModel
@@ -15,5 +16,8 @@ fun androidModule() = module {
     }
     viewModel {
         WorkoutSessionViewModel(get(), get())
+    }
+    viewModel{
+        CalendarViewModel(get())
     }
 }

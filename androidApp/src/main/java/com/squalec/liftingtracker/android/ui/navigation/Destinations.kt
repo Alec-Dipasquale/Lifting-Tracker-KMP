@@ -24,4 +24,7 @@ sealed class Destination {
         val date: String? = null,
         val addedExerciseId: String? = null
     )
+
+    @Serializable
+    object CalendarView
 }

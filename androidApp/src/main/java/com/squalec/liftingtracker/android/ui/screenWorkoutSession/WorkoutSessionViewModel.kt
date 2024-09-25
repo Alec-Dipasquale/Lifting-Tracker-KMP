@@ -69,6 +69,9 @@ class WorkoutSessionViewModel(
             is WorkoutSessionEvent.ChangeSetReps -> {
                 onChangeSetReps(event.exercise, event.position, event.reps)
             }
+            is WorkoutSessionEvent.ChangeWorkoutTitle -> {
+                changeWorkoutTitle(event.text)
+            }
         }
     }
 
@@ -245,6 +248,17 @@ class WorkoutSessionViewModel(
     private fun onUpdateWorkoutCache(){
         WorkoutSessionManager.updateModel(_state.value.workoutSessionModel ?: return)
     }
+
+    private fun changeWorkoutTitle(text: String) {
+        _state.update {
+            it.copy(
+                workoutSessionModel = it.workoutSessionModel?.copy(
+                    workoutName = text
+                )
+            )
+        }
+        onUpdateWorkoutCache()
+    }
 }
 
 data class WorkoutSessionState(
@@ -262,4 +276,5 @@ sealed class WorkoutSessionEvent {
     data class OnAddSet(val set: SetSessionModel, val exerciseId: String) : WorkoutSessionEvent()
     data class ChangeSetWeight(val exercise: ExerciseSessionModel, val position: Int, val weight: Float) : WorkoutSessionEvent()
     data class ChangeSetReps(val exercise: ExerciseSessionModel, val position: Int, val reps: Int) : WorkoutSessionEvent()
+    data class ChangeWorkoutTitle(val text: String) : WorkoutSessionEvent()
 }

@@ -61,6 +61,7 @@ dependencies {
     debugImplementation(libs.compose.ui.tooling)
     implementation(libs.koin.androidx.compose)
 
+    implementation(libs.kizit.calendar)
 
 
     implementation(project(":shared"))

@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,6 +26,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.squalec.liftingtracker.android.ui.navigation.Destination
 import com.squalec.liftingtracker.android.ui.navigation.TabDestinations
+import com.squalec.liftingtracker.android.ui.utilities.Icons
 import com.squalec.liftingtracker.appdatabase.WorkoutSessionManager
 import com.squalec.liftingtracker.utils.CustomDate
 
@@ -36,7 +39,18 @@ fun HomeScreen(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally,
 
         ) {
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+            IconButton(
+
+                onClick = {
+                    navController.navigate(Destination.CalendarView)
+                }) {
+                Icon(
+                    modifier = Modifier.size(48.dp),
+                    imageVector = Icons.Custom.MyHistory(),
+                    contentDescription = ""
+                )
+            }
             Box(
                 modifier = Modifier
                     .size(150.dp)
@@ -47,7 +61,7 @@ fun HomeScreen(navController: NavController) {
                     .padding(4.dp)
                     .align(Alignment.Center)
                     .clickable {
-                        val date = if(WorkoutSessionManager.workoutState.value.isWorkoutInProgress)
+                        val date = if (WorkoutSessionManager.workoutState.value.isWorkoutInProgress)
                             null else CustomDate.now().utcDate
                         navController.navigate(Destination.WorkoutSession(date = date))
                     },

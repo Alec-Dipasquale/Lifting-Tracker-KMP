@@ -8,4 +8,6 @@ expect class CustomDate(utcDate: String) {
     companion object{
         fun now(): CustomDate
     }
+
+    fun formattedToDay(): String
 }

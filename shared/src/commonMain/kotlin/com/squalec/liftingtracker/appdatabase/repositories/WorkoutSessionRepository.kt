@@ -7,10 +7,12 @@ import com.squalec.liftingtracker.appdatabase.dao.UserWorkoutSessionDao
 import com.squalec.liftingtracker.appdatabase.models.ExerciseDetails
 import com.squalec.liftingtracker.appdatabase.models.UserWorkoutSession
 import com.squalec.liftingtracker.utils.CustomDate
+import com.squalec.liftingtracker.utils.CustomDateRange
 import kotlin.time.Duration
 
 interface WorkoutSessionRepository {
     suspend fun getWorkoutSessionByDate(date: CustomDate): WorkoutSessionModel
+    suspend fun getWorkoutSessionByRange(dateRange: CustomDateRange): List<WorkoutSessionModel>
     suspend fun getWorkoutSessionId(date: CustomDate): Long
     suspend fun saveWorkoutSession(workoutSessionModel: WorkoutSessionModel)
     suspend fun addExerciseToWorkoutSession()
@@ -26,7 +28,16 @@ class WorkoutSessionRepositoryImpl(
     private val exerciseDetailDao: ExerciseDetailDao
 ) : WorkoutSessionRepository {
     override suspend fun getWorkoutSessionByDate(date: CustomDate): WorkoutSessionModel {
-        return userWorkoutSessionDao.getWorkoutSessionByDate(date.defaultFormat()).toWorkoutSessionModel(userExerciseDao, userSetDao, exerciseDetailDao)
+        return userWorkoutSessionDao.getWorkoutSessionByDate(date.defaultFormat())
+            .toWorkoutSessionModel(userExerciseDao, userSetDao, exerciseDetailDao)
+    }
+
+    override suspend fun getWorkoutSessionByRange(dateRange: CustomDateRange): List<WorkoutSessionModel> {
+        val (startOfDay, endOfDay) = dateRange.getRange()
+        return userWorkoutSessionDao.getWorkoutSessionsByDateRange(
+            startOfDay.defaultFormat(),
+            endOfDay.defaultFormat()
+        ).map { it.toWorkoutSessionModel(userExerciseDao, userSetDao, exerciseDetailDao) }
     }
 
     override suspend fun getWorkoutSessionId(date: CustomDate): Long {
@@ -40,8 +51,9 @@ class WorkoutSessionRepositoryImpl(
     }
 
     override suspend fun saveWorkoutSession(workoutSessionModel: WorkoutSessionModel) {
-        val workoutSessionId = userWorkoutSessionDao.insertWorkoutSession(
+        userWorkoutSessionDao.insertWorkoutSession(
             UserWorkoutSession(
+                workoutName = workoutSessionModel.workoutName,
                 date = workoutSessionModel.date.defaultFormat(),
                 caloriesBurned = workoutSessionModel.caloriesBurned,
                 duration = workoutSessionModel.duration,
@@ -69,9 +81,11 @@ class WorkoutSessionRepositoryImpl(
 suspend fun UserWorkoutSession.toWorkoutSessionModel(
     exerciseDao: UserExerciseDao,
     setDao: UserSetDao,
-    exerciseDetailDao: ExerciseDetailDao): WorkoutSessionModel {
+    exerciseDetailDao: ExerciseDetailDao
+): WorkoutSessionModel {
     val exercises = exerciseDao.getUserExerciseDetailsForSession(id)
     return WorkoutSessionModel(
+        workoutName = workoutName,
         date = CustomDate(date),
         exercises = exercises.map { exercise ->
             val sets = setDao.getUserExerciseSetsForWorkout(exercise.id)
@@ -91,8 +105,14 @@ suspend fun UserWorkoutSession.toWorkoutSessionModel(
 }
 
 data class WorkoutSessionModel(
+    val workoutName: String = "",
     val date: CustomDate,
-    val exercises: List<ExerciseSessionModel> = listOf(ExerciseSessionModel(exercise = null, orderPosition = 0)),
+    val exercises: List<ExerciseSessionModel> = listOf(
+        ExerciseSessionModel(
+            exercise = null,
+            orderPosition = 0
+        )
+    ),
     val duration: Long = 0,
     val caloriesBurned: Int = 0,
 )
