@@ -20,7 +20,8 @@ import kotlinx.serialization.Serializable
     indices = [Index(value = ["exercise_id"])] // Ensure the foreign key column is indexed
 )
 data class UserSet(
-    @PrimaryKey @ColumnInfo(name = "id") val id: String,
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id") val id: Int = 0,
     @ColumnInfo(name = "order_position") val orderPosition: Int,
     @ColumnInfo(name = "weight") val weight: Float,
     @ColumnInfo(name = "reps") val reps: Int,

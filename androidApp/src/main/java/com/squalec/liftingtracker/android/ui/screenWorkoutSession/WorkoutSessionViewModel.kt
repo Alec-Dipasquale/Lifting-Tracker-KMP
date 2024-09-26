@@ -51,6 +51,7 @@ class WorkoutSessionViewModel(
             is WorkoutSessionEvent.OnChangeDate -> {
                 changeDate(event.date)
                 WorkoutSessionManager.startWorkout()
+//                createWorkoutId()
             }
 
             is WorkoutSessionEvent.OnFinishedWorkout -> {
@@ -60,25 +61,44 @@ class WorkoutSessionViewModel(
             is WorkoutSessionEvent.OnAddSet -> {
                 onAddSet(event.set, event.exerciseId)
             }
+
             is WorkoutSessionEvent.OnRemoveSet -> {
 
             }
+
             is WorkoutSessionEvent.ChangeSetWeight -> {
                 onChangeSetWeight(event.exercise, event.position, event.weight)
             }
+
             is WorkoutSessionEvent.ChangeSetReps -> {
                 onChangeSetReps(event.exercise, event.position, event.reps)
             }
+
             is WorkoutSessionEvent.ChangeWorkoutTitle -> {
                 changeWorkoutTitle(event.text)
             }
+
+            is WorkoutSessionEvent.OnLoadWorkoutSession -> onLoadWorkoutSession(event.workoutId)
         }
     }
 
-    private fun onChangeSetReps(exercise: ExerciseSessionModel, position:Int, reps: Int) {
+//    private fun createWorkoutId() {
+//        viewModelScope.launch(Dispatchers.IO) {
+//            val workoutId = workoutSessionRepository.
+//            _state.update {
+//                it.copy(
+//                    workoutSessionModel = it.workoutSessionModel?.copy(
+//                        workoutId = workoutId
+//                    )
+//                )
+//            }
+//        }
+//    }
+
+    private fun onChangeSetReps(exercise: ExerciseSessionModel, position: Int, reps: Int) {
         val updatedExercise = exercise.copy(
             sets = exercise.sets.map {
-                if (it.orderPosition ==  position) {
+                if (it.orderPosition == position) {
                     it.copy(
                         reps = reps
                     )
@@ -151,7 +171,7 @@ class WorkoutSessionViewModel(
         }
     }
 
-    private fun onAddSet(set: SetSessionModel, exerciseId: String){
+    private fun onAddSet(set: SetSessionModel, exerciseId: String) {
         val workoutSession = _state.value.workoutSessionModel ?: return
         val exercise = workoutSession.exercises.find { it.exercise?.id == exerciseId } ?: return
         val lastSet = exercise.sets.lastOrNull() ?: return
@@ -245,7 +265,7 @@ class WorkoutSessionViewModel(
         }
     }
 
-    private fun onUpdateWorkoutCache(){
+    private fun onUpdateWorkoutCache() {
         WorkoutSessionManager.updateModel(_state.value.workoutSessionModel ?: return)
     }
 
@@ -259,12 +279,36 @@ class WorkoutSessionViewModel(
         }
         onUpdateWorkoutCache()
     }
+
+    private fun onLoadWorkoutSession(workoutId: String) {
+        _state.update {
+            it.copy(isLoading = true)
+        }
+        viewModelScope.launch(Dispatchers.IO) {
+            val workoutSession = workoutSessionRepository.getWorkoutSessionById(workoutId)
+            _state.update {
+                it.copy(
+                    workoutSessionModel = WorkoutSessionModel(
+                        workoutId = workoutSession.workoutId,
+                        workoutName = workoutSession.workoutName,
+                        exercises = workoutSession.exercises,
+                        date = workoutSession.date
+
+                    ),
+                    date = workoutSession?.date,
+                    isFinished = true,
+                    isLoading = false
+                )
+            }
+        }
+    }
 }
 
 data class WorkoutSessionState(
     val date: CustomDate? = null,
     val workoutSessionModel: WorkoutSessionModel? = null,
-    val isFinished : Boolean = false
+    val isFinished: Boolean = false,
+    val isLoading : Boolean = false
 )
 
 sealed class WorkoutSessionEvent {
@@ -274,7 +318,15 @@ sealed class WorkoutSessionEvent {
     object OnRemoveSet : WorkoutSessionEvent()
     object OnFinishedWorkout : WorkoutSessionEvent()
     data class OnAddSet(val set: SetSessionModel, val exerciseId: String) : WorkoutSessionEvent()
-    data class ChangeSetWeight(val exercise: ExerciseSessionModel, val position: Int, val weight: Float) : WorkoutSessionEvent()
-    data class ChangeSetReps(val exercise: ExerciseSessionModel, val position: Int, val reps: Int) : WorkoutSessionEvent()
+    data class ChangeSetWeight(
+        val exercise: ExerciseSessionModel,
+        val position: Int,
+        val weight: Float
+    ) : WorkoutSessionEvent()
+
+    data class ChangeSetReps(val exercise: ExerciseSessionModel, val position: Int, val reps: Int) :
+        WorkoutSessionEvent()
+
     data class ChangeWorkoutTitle(val text: String) : WorkoutSessionEvent()
+    data class OnLoadWorkoutSession(val workoutId: String) : WorkoutSessionEvent()
 }

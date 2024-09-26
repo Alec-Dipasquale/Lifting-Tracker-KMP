@@ -31,7 +31,9 @@ import kotlinx.serialization.Serializable
     ] // Ensure the foreign key column is indexed
 )
 data class UserExercise(
-    @PrimaryKey @ColumnInfo(name = "id") val id: String,
+
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id") val id: Int = 0,
     @ColumnInfo(name = "order_position") val orderPosition: Int,
     @ColumnInfo(name = "exercise_details_id") val exerciseDetailsId: String,
     @ColumnInfo(name = "workout_session_id") val workoutSessionId: String

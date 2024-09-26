@@ -97,6 +97,7 @@ fun NavGraph(isLoading: Boolean) {
             composable<Destination.WorkoutSession> { parameters ->
                 val dateParam = parameters.arguments?.getString("date")
                 val addedExerciseId = parameters.arguments?.getString("addedExerciseId")
+                val workoutSessionID = parameters.arguments?.getString("workoutSessionID")
 
                 val customDate = dateParam?.let {
                     CustomDate(dateParam)
@@ -108,14 +109,15 @@ fun NavGraph(isLoading: Boolean) {
                     WorkoutSessionScreen(
                         navController = navController,
                         date = customDate,
-                        addedExerciseId = addedExerciseId
+                        addedExerciseId = addedExerciseId,
+                        workoutSessionId = workoutSessionID
                     )
                 }
             }
 
             composable<Destination.CalendarView> {
                 CalendarViewTheme {
-                    CalendarView()
+                    CalendarView(navController = navController)
                 }
             }
         }

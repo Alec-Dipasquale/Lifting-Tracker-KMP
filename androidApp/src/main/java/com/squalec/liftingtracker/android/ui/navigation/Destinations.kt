@@ -22,7 +22,8 @@ sealed class Destination {
     @Serializable
     data class WorkoutSession(
         val date: String? = null,
-        val addedExerciseId: String? = null
+        val addedExerciseId: String? = null,
+        val workoutSessionID: String? = null
     )
 
     @Serializable

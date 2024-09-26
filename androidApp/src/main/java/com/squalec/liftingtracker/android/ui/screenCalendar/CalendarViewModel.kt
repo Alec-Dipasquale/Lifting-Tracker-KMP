@@ -2,6 +2,8 @@ package com.squalec.liftingtracker.android.ui.screenCalendar
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
+import com.squalec.liftingtracker.android.ui.navigation.Destination
 import com.squalec.liftingtracker.appdatabase.repositories.WorkoutSessionModel
 import com.squalec.liftingtracker.appdatabase.repositories.WorkoutSessionRepository
 import com.squalec.liftingtracker.utils.CustomDate
@@ -22,6 +24,7 @@ class CalendarViewModel(private val workoutSessionRepository: WorkoutSessionRepo
             is CalendarIntent.GetWorkoutSessions -> getWorkoutSessions(intent.dateRange)
             is CalendarIntent.OnDaySelected -> showWorkoutsDialogue(intent.day, intent.workoutSessions)
             is CalendarIntent.CloseWorkoutsDialogue -> closeWorkoutsDialogue()
+            is CalendarIntent.OnWorkoutSelected -> workoutSelected(intent.workoutSession, intent.navController)
         }
     }
 
@@ -47,6 +50,14 @@ class CalendarViewModel(private val workoutSessionRepository: WorkoutSessionRepo
         }
     }
 
+    private fun workoutSelected(workoutSession: WorkoutSessionModel, nav: NavController) {
+        nav.navigate(Destination.WorkoutSession(workoutSessionID = workoutSession.workoutId)) {
+            popUpTo(Destination.WorkoutSession()) {
+                inclusive = true
+            }
+        }
+    }
+
 }
 
 data class CalendarState(
@@ -67,4 +78,5 @@ sealed class CalendarIntent {
     data class GetWorkoutSessions(val dateRange: CustomDateRange) : CalendarIntent()
     data class OnDaySelected(val day: CustomDate, val workoutSessions: List<WorkoutSessionModel>) : CalendarIntent()
     object CloseWorkoutsDialogue : CalendarIntent()
+    data class OnWorkoutSelected(val workoutSession: WorkoutSessionModel, val navController: NavController) : CalendarIntent()
 }

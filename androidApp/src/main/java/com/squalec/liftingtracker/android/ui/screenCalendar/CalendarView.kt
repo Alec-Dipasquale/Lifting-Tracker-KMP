@@ -17,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.CalendarDay
@@ -35,7 +36,8 @@ import java.time.YearMonth
 
 @Composable
 fun CalendarView(
-    viewModel: CalendarViewModel = koinViewModel()
+    viewModel: CalendarViewModel = koinViewModel(),
+    navController: NavController
 ) {
     val currentMonth = remember { YearMonth.now() }
     val startMonth = remember { currentMonth.minusMonths(24) } // Adjust as needed
@@ -79,6 +81,7 @@ fun CalendarView(
     if (state.calendarWorkoutDialogueState.isWorkoutsDialogueOpen) {
         CalendarWorkoutsDialogue(
             state.calendarWorkoutDialogueState,
+            navController = navController,
             onIntent = { intent ->
                 viewModel.intent(intent)
             }

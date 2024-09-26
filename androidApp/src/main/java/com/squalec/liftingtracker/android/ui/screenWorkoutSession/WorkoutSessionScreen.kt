@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -55,6 +56,7 @@ fun WorkoutSessionScreen(
     date: CustomDate? = null,
     navController: NavController,
     addedExerciseId: String? = null,
+    workoutSessionId: String? = null,
     viewModel: WorkoutSessionViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -62,8 +64,14 @@ fun WorkoutSessionScreen(
 
 
     LaunchedEffect(key1 = date) {
-        if (date != null && !workoutManagerState.isWorkoutInProgress) {
+        if (date != null && !workoutManagerState.isWorkoutInProgress && workoutSessionId == null) {
             viewModel.handleEvent(WorkoutSessionEvent.OnChangeDate(date))
+        }
+    }
+
+    LaunchedEffect(key1 = workoutSessionId) {
+        if (workoutSessionId != null) {
+            viewModel.handleEvent(WorkoutSessionEvent.OnLoadWorkoutSession(workoutSessionId.toString()))
         }
     }
 
@@ -72,15 +80,20 @@ fun WorkoutSessionScreen(
             viewModel.handleEvent(WorkoutSessionEvent.OnAddExercise(addedExerciseId))
         }
     }
-
-    WorkoutSessionLazyColumn(
-        state = state,
-        workoutManagerState = workoutManagerState,
-        onIntent = {
-            viewModel.handleEvent(it)
-        },
-        navController = navController
-    )
+    if(state.isLoading){
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator(progress = 0.5f)
+        }
+    } else {
+        WorkoutSessionLazyColumn(
+            state = state,
+            workoutManagerState = workoutManagerState,
+            onIntent = {
+                viewModel.handleEvent(it)
+            },
+            navController = navController
+        )
+    }
 
 
 
@@ -111,7 +124,7 @@ fun WorkoutSessionLazyColumn(
                 date = state.date,
             )
 
-            UserTitle(text = state.workoutSessionModel?.workoutName?:"",onIntent, state.isFinished)
+            UserTitle(text = state.workoutSessionModel?.workoutName?:"Workout",onIntent, state.isFinished)
         }
         state.workoutSessionModel?.exercises?.let { exercises ->
             item {
@@ -183,7 +196,7 @@ fun UserTitle(text:String, onIntent: (WorkoutSessionEvent) -> Unit, finished: Bo
                             onIntent(
                                 WorkoutSessionEvent.ChangeWorkoutTitle(title.text)
                             )
-                        } else{
+                        } else {
                             title = title.copy(
                                 selection = TextRange(0, title.text.length)
                             )

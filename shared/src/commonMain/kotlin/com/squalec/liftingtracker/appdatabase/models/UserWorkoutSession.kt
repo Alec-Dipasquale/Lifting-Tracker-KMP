@@ -11,7 +11,7 @@ import kotlinx.serialization.Serializable
 data class  UserWorkoutSession(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id") val id: Int = 0,
-    @ColumnInfo(name = "workout_name", defaultValue = "") val workoutName: String = "",
+    @ColumnInfo(name = "workout_name", defaultValue = "Workout") val workoutName: String = "",
     @ColumnInfo(name = "date") val date: String = "",
     @ColumnInfo(name = "duration") val duration: Long = 0,
     @ColumnInfo(name = "calories_burned") val caloriesBurned: Int = 0,

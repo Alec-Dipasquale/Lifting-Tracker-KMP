@@ -22,8 +22,8 @@ actual object DBFactory : KoinComponent {
             val instance = Room.databaseBuilder(
                 context.applicationContext,
                 AppDatabase::class.java,
-                dbFileName
-            )
+                dbFileName,
+            ).addMigrations(MIGRATION_1_2)
                 .build()
             INSTANCE = instance
             instance
@@ -43,4 +43,30 @@ actual object DBFactory : KoinComponent {
     private fun uploadJsonToDatabase(context: Context, fileName: String): String {
         return context.assets.open(fileName).bufferedReader().use { it.readText() }
     }
+    private val MIGRATION_1_2 = object : Migration(1, 2) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            // Create a new table with the correct schema
+            database.execSQL("""
+            CREATE TABLE user_exercise_new (
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                order_position INTEGER NOT NULL,
+                exercise_details_id TEXT NOT NULL,
+                workout_session_id TEXT NOT NULL
+            )
+        """)
+
+            // Copy the data from the old table to the new table
+            database.execSQL("""
+            INSERT INTO user_exercise_new (order_position, exercise_details_id, workout_session_id)
+            SELECT order_position, exercise_details_id, workout_session_id FROM user_exercise
+        """)
+
+            // Remove the old table
+            database.execSQL("DROP TABLE user_exercise")
+
+            // Rename the new table to the old table name
+            database.execSQL("ALTER TABLE user_exercise_new RENAME TO user_exercise")
+        }
+    }
+
 }

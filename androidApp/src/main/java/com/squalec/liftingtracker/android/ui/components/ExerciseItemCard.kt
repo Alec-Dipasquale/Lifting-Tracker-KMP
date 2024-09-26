@@ -93,23 +93,25 @@ fun ExerciseItemCard(
                             color = MaterialTheme.colorScheme.onSurface
                         )
                     }
-                    Button(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp),
-                        onClick = {
-                        onIntent(
-                            WorkoutSessionEvent.OnAddSet(
-                                SetSessionModel(
-                                    orderPosition = exercise.sets.size,
-                                ),
-                                exerciseId = exercise.exercise?.id ?: error("Exercise id is null")
-                            )
-                        )
-                    }) {
-                        Text(text = "Add Set")
-                    }
+                    if (!isFinished)
+                        Button(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp),
+                            onClick = {
+                                onIntent(
+                                    WorkoutSessionEvent.OnAddSet(
+                                        SetSessionModel(
+                                            orderPosition = exercise.sets.size,
+                                        ),
+                                        exerciseId = exercise.exercise?.id
+                                            ?: error("Exercise id is null")
+                                    )
+                                )
+                            }) {
+                            Text(text = "Add Set")
+                        }
                 }
 
             }
@@ -162,9 +164,11 @@ fun WeightSetsHeader(modifier: Modifier) {
 @Composable
 fun ExerciseItemCardPreview() {
     WorkoutSessionTheme {
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
             ExerciseItemCard(
                 exercise = ExerciseSessionModel(
                     exercise = null,

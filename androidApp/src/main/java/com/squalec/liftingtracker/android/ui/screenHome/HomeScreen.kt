@@ -55,16 +55,17 @@ fun HomeScreen(navController: NavController) {
                 modifier = Modifier
                     .size(150.dp)
                     .clip(CircleShape)
+                    .clickable {
+                        val date = if (WorkoutSessionManager.workoutState.value.isWorkoutInProgress)
+                            null else CustomDate.now().utcDate
+                        navController.navigate(Destination.WorkoutSession(date = date))
+                    }
                     .background(MaterialTheme.colorScheme.primary)
                     .padding(16.dp)
                     .border(4.dp, MaterialTheme.colorScheme.secondary, CircleShape)
                     .padding(4.dp)
                     .align(Alignment.Center)
-                    .clickable {
-                        val date = if (WorkoutSessionManager.workoutState.value.isWorkoutInProgress)
-                            null else CustomDate.now().utcDate
-                        navController.navigate(Destination.WorkoutSession(date = date))
-                    },
+                ,
                 contentAlignment = Alignment.Center) {
                 Text(
                     text = "Start\n Workout",

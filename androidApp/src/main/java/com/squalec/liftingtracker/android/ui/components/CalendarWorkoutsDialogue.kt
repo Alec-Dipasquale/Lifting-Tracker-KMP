@@ -2,7 +2,9 @@ package com.squalec.liftingtracker.android.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,10 +16,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.squalec.liftingtracker.android.ui.screenCalendar.CalendarIntent
 import com.squalec.liftingtracker.android.ui.screenCalendar.CalendarWorkoutDialogueState
 import com.squalec.liftingtracker.appdatabase.models.ExerciseDetails
@@ -28,7 +34,8 @@ import com.squalec.liftingtracker.utils.CustomDate
 @Composable
 fun CalendarWorkoutsDialogue(
     state: CalendarWorkoutDialogueState,
-    onIntent: (CalendarIntent) -> Unit = { }
+    onIntent: (CalendarIntent) -> Unit = { },
+    navController: NavController
 ) {
 
     val workoutSessions = state.workoutSessions
@@ -45,7 +52,6 @@ fun CalendarWorkoutsDialogue(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.background)
-                    .border(1.dp, MaterialTheme.colorScheme.secondary, MaterialTheme.shapes.medium)
                     .padding(16.dp)
 
             ) {
@@ -54,20 +60,52 @@ fun CalendarWorkoutsDialogue(
                     style = MaterialTheme.typography.headlineMedium,
                     modifier = Modifier.padding(16.dp)
                 )
-                LazyColumn {
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
                     items(workoutSessions) { workoutSession ->
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(8.dp)
+                                .border(
+                                    1.dp,
+                                    MaterialTheme.colorScheme.onSurface,
+                                    MaterialTheme.shapes.small
+                                )
+                                .clip(MaterialTheme.shapes.medium)
+                                .clickable {
+                                    onIntent(
+                                        CalendarIntent.OnWorkoutSelected(
+                                            workoutSession,
+                                            navController = navController
+                                        )
+                                    )
+                                }
+                                .padding(8.dp),
+                            horizontalAlignment = Alignment.End
                         ) {
-                            Text(
-                                text = workoutSession.workoutName,
-                                style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.weight(1f)
-                            )
-                            Column {
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(8.dp)
+                            ) {
+                                Text(
+                                    text = workoutSession.workoutName,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                Text(
+                                    text = "Exercises",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.padding(end = 16.dp)
+                                )
+                            }
+                            Column(
+                                Modifier
+                                    .padding(4.dp)
+                                    .padding(end = 8.dp)
+                            ) {
                                 workoutSession.exercises.forEach {
                                     Text(
                                         text = "${it.exercise?.name ?: "Unknown"}",
@@ -89,6 +127,7 @@ fun CalendarWorkoutsDialogue(
 @Composable
 fun PreviewCalendarWorkoutsDialogue() {
     CalendarWorkoutsDialogue(
+        navController = rememberNavController(),
         state = CalendarWorkoutDialogueState(
             day = CustomDate("2022-01-01T00:00:00"),
             workoutSessions = listOf(

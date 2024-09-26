@@ -15,4 +15,6 @@ interface UserExerciseDao {
     suspend fun getUserExerciseDetailsForSession(sessionId: Int): List<UserExercise>
     @Query("SELECT * FROM user_exercise WHERE id = :exerciseId")
     suspend fun getUserExerciseDetails(exerciseId: Int): UserExercise
+    @Insert
+    suspend fun insertAllUserExerciseDetails(exercises: List<UserExercise>)
 }

@@ -123,6 +123,7 @@ fun DayPreview() {
                     day = CalendarDay(LocalDate.now(), DayPosition.MonthDate),
                     workoutSessions = listOf(
                         WorkoutSessionModel(
+                            workoutId = "1",
                             "Workout 1",
                             exercises = emptyList(),
                             caloriesBurned = 0,
@@ -130,6 +131,7 @@ fun DayPreview() {
                             date = CustomDate.now()
                         ),
                         WorkoutSessionModel(
+                            workoutId = "2",
                             "Workout 2",
                             exercises = emptyList(),
                             caloriesBurned = 0,
@@ -137,6 +139,7 @@ fun DayPreview() {
                             date = CustomDate.now()
                         ),
                         WorkoutSessionModel(
+                            workoutId = "3",
                             "Workout 3",
                             exercises = emptyList(),
                             caloriesBurned = 0,

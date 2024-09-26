@@ -9,6 +9,8 @@ import com.squalec.liftingtracker.appdatabase.models.UserSet
 interface UserSetDao {
     @Insert
     suspend fun insertUserExerciseSet(userExerciseSet: UserSet)
+    @Insert
+    suspend fun insertAllUserExerciseSets(userExerciseSets: List<UserSet>)
     @Query("SELECT * FROM user_sets")
     suspend fun getUserExerciseSets(): List<UserSet>
     @Query("SELECT * FROM user_sets WHERE exercise_id = :exerciseId")
