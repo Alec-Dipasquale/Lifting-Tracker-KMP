@@ -29,16 +29,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.squalec.liftingtracker.android.ui.screenExerciseSearch.ExerciseSearchIntent
+import com.squalec.liftingtracker.android.ui.screenExerciseSearch.MuscleFilterState
+import com.squalec.liftingtracker.android.ui.screenWorkoutSession.WorkoutSessionEvent
 import com.squalec.liftingtracker.android.ui.themes.SearchExercisesTheme
+import com.squalec.liftingtracker.appdatabase.repositories.Operator
 
 @Composable
 fun DropDownMuscleSelector(
     modifier: Modifier = Modifier,
     muscleNames: List<String>,
     selectedMuscles: List<String>,
-    onMuscleClicked: (List<String>) -> Unit
+    onMuscleClicked: (List<String>) -> Unit,
+    onIntent: (ExerciseSearchIntent) -> Unit,
+    filterState: MuscleFilterState,
+    isExpanded: Boolean = false
 ) {
-    var expanded by remember { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(isExpanded) }
 
     Column(modifier = modifier) {
         Row(
@@ -63,15 +70,53 @@ fun DropDownMuscleSelector(
                 .fillMaxWidth()
                 .wrapContentHeight(), visible = expanded
         ) {
-            MuscleChips(
-                muscleNames = muscleNames,
-                selectedMuscles = selectedMuscles,
-                onMuscleClicked = {
-                    onMuscleClicked(it)
-                })
+            Column {
+                MuscleChipFilters(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .align(Alignment.CenterHorizontally),
+                    onIntent = { onIntent(it) },
+                    state = filterState
+                )
+                MuscleChips(
+                    muscleNames = muscleNames,
+                    selectedMuscles = selectedMuscles,
+                    onMuscleClicked = {
+                        onMuscleClicked(it)
+                    })
+            }
         }
 
 
+    }
+}
+
+@Composable
+fun MuscleChipFilters(
+    modifier: Modifier = Modifier,
+    onIntent: (ExerciseSearchIntent) -> Unit,
+    state: MuscleFilterState,
+) {
+
+
+    Column(modifier = modifier) {
+        Row {
+            Chip(
+                text = "And",
+                onClick = {
+                    onIntent(ExerciseSearchIntent.OperatorChanged(Operator.AND))
+                          },
+                isSelected = if (state.operatorSelected == Operator.AND) true else false
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Chip(
+                text = "Or",
+                onClick = {
+                    onIntent(ExerciseSearchIntent.OperatorChanged(Operator.OR))
+                },
+                isSelected = if (state.operatorSelected == Operator.OR) true else false
+            )
+        }
     }
 }
 
@@ -91,13 +136,20 @@ fun PreviewDropDownMuscleSelector() {
     )
     var selectedMuscles by remember { mutableStateOf(listOf<String>()) }
     SearchExercisesTheme {
-        Box(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
             DropDownMuscleSelector(
+                isExpanded = true,
                 muscleNames = muscles,
                 selectedMuscles = selectedMuscles,
                 onMuscleClicked = { newSelectedMuscles ->
                     selectedMuscles = newSelectedMuscles
-                }
+                },
+                onIntent = {},
+                filterState = MuscleFilterState()
             )
         }
     }

@@ -3,10 +3,9 @@ package com.squalec.liftingtracker.android.ui.screenExerciseSearch
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.StateFlow
-import com.squalec.liftingtracker.appdatabase.DBFactory
 import com.squalec.liftingtracker.appdatabase.models.ExerciseDetails
 import com.squalec.liftingtracker.appdatabase.repositories.ExerciseDetailsRepository
-import com.squalec.liftingtracker.appdatabase.repositories.ExerciseDetailsRepositoryImpl
+import com.squalec.liftingtracker.appdatabase.repositories.Operator
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -27,6 +26,17 @@ class ExerciseSearchViewModel (private val exerciseDetailsRepository: ExerciseDe
             is ExerciseSearchIntent.GetAllMuscleNames -> getMuscleNames()
             is ExerciseSearchIntent.SearchExercises -> searchExercises(intent.searchText)
             is ExerciseSearchIntent.UpdateFilter -> updateFilter(intent.filter)
+            is ExerciseSearchIntent.OperatorChanged -> updateOperator(intent.operator)
+        }
+    }
+
+    private fun updateOperator(operator: Operator) {
+        _state.update {
+            it.copy(
+                muscleFilterState = it.muscleFilterState.copy(
+                    operatorSelected = operator
+                )
+            )
         }
     }
 
@@ -72,7 +82,8 @@ class ExerciseSearchViewModel (private val exerciseDetailsRepository: ExerciseDe
                 level?: "",
                 force?: "",
                 mechanic?: "",
-                category?: ""
+                category?: "",
+                operatorFilter = _state.value.muscleFilterState.operatorSelected
             )
 
             _state.update {
@@ -120,15 +131,22 @@ sealed class ExerciseSearchIntent {
     data class SearchExercises(val searchText: String) : ExerciseSearchIntent()
     data class UpdateFilter(val filter: ExerciseFilters) : ExerciseSearchIntent()
     data object GetAllMuscleNames : ExerciseSearchIntent()
+    data class OperatorChanged(val operator: Operator) : ExerciseSearchIntent()
 }
 
 data class ExerciseSearchState(
     val isExerciseLoading: Boolean = false,
     val exercises: List<ExerciseDetails> = emptyList(),
     val filters: ExerciseFilters = ExerciseFilters(),
+    val muscleFilterState: MuscleFilterState = MuscleFilterState(),
     val muscleNames: List<String>? = null,
     val searchText: String = ""
 )
+
+data class MuscleFilterState(
+    val operatorSelected: Operator = Operator.AND,
+)
+
 
 data class ExerciseFilters(
     val muscle: List<String>? = null,

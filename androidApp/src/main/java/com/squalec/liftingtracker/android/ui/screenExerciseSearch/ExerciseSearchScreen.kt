@@ -104,7 +104,9 @@ fun ExerciseSearchScreen(
                             )
                         )
                     )
-                }
+                },
+                onIntent = { viewModel.intent(it) },
+                filterState = state.muscleFilterState
             )
         }
 

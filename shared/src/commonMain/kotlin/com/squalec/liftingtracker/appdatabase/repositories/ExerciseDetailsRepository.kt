@@ -4,7 +4,7 @@ import ExerciseDetailDao
 import com.squalec.liftingtracker.appdatabase.Logs
 import com.squalec.liftingtracker.appdatabase.models.ExerciseDetails
 
-interface ExerciseDetailsRepository{
+interface ExerciseDetailsRepository {
     suspend fun getAllExerciseDetails(): List<ExerciseDetails>
 
     suspend fun insertAllExerciseDetails(exerciseDetails: List<ExerciseDetails>)
@@ -20,12 +20,14 @@ interface ExerciseDetailsRepository{
         level: String? = null,
         force: String? = null,
         mechanic: String? = null,
-        category: String? = null
+        category: String? = null,
+        operatorFilter: Operator
     ): List<ExerciseDetails>
 
-    suspend  fun getExerciseDetails(id: String): ExerciseDetails?
+    suspend fun getExerciseDetails(id: String): ExerciseDetails?
 
 }
+
 class ExerciseDetailsRepositoryImpl(
     private val exerciseDetailsDao: ExerciseDetailDao
 ) : ExerciseDetailsRepository {
@@ -57,21 +59,57 @@ class ExerciseDetailsRepositoryImpl(
         level: String?,
         force: String?,
         mechanic: String?,
-        category: String?
+        category: String?,
+        operatorFilter: Operator
     ): List<ExerciseDetails> {
+        if (operatorFilter == Operator.OR) {
+            // Extract up to 17 muscles from the list, or null if not available
+            val muscle1 = muscles?.getOrNull(0)
+            val muscle2 = muscles?.getOrNull(1)
+            val muscle3 = muscles?.getOrNull(2)
+            val muscle4 = muscles?.getOrNull(3)
+            val muscle5 = muscles?.getOrNull(4)
+            val muscle6 = muscles?.getOrNull(5)
+            val muscle7 = muscles?.getOrNull(6)
 
-        return exerciseDetailsDao.searchWithFilters(
-            search = search,
-            muscles = muscles,
-            equipment = equipment,
-            level = level,
-            force = force,
-            mechanic = mechanic,
-            category = category
-        )
+            // Call the DAO method with the extracted muscles and other filters
+            return exerciseDetailsDao.searchWithAnyMuscle(
+                search = search,
+                muscle1 = muscle1,
+                muscle2 = muscle2,
+                muscle3 = muscle3,
+                muscle4 = muscle4,
+                muscle5 = muscle5,
+                muscle6 = muscle6,
+                muscle7 = muscle7,
+//                equipment = equipment,
+//                level = level,
+//                force = force,
+//                mechanic = mechanic,
+//                category = category
+            )
+        } else {
+            // Implement behavior for other operators if necessary
+            // For example, handling AND operator logic
+            return exerciseDetailsDao.searchWithAllMuscles(
+                search = search,
+                muscles = muscles,
+                equipment = equipment,
+                level = level,
+                force = force,
+                mechanic = mechanic,
+                category = category
+
+            )
+        }
     }
 
     override suspend fun getExerciseDetails(id: String): ExerciseDetails? {
         return exerciseDetailsDao.getExerciseDetailsById(id)
     }
+}
+
+enum class Operator {
+    AND,
+    OR
 }

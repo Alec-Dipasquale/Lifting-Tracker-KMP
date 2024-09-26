@@ -46,16 +46,55 @@ interface ExerciseDetailDao {
     suspend fun searchExercises(search: String): List<ExerciseDetails>
 
     @Query("""
+    SELECT DISTINCT * FROM exercise_details
+    WHERE LOWER(name) LIKE '%' || LOWER(:search) || '%'
+    AND (
+        (:muscle1 IS NULL OR (primaryMuscles LIKE '%' || '["' || :muscle1 || '"]%' OR primaryMuscles LIKE '%' || ',"' || :muscle1 || '"%'
+                              OR secondaryMuscles LIKE '%' || '["' || :muscle1 || '"]%' OR secondaryMuscles LIKE '%' || ',"' || :muscle1 || '"%'))
+        OR (:muscle2 OR (primaryMuscles LIKE '%' || '["' || :muscle2 || '"]%' OR primaryMuscles LIKE '%' || ',"' || :muscle2 || '"%'
+                              OR secondaryMuscles LIKE '%' || '["' || :muscle2 || '"]%' OR secondaryMuscles LIKE '%' || ',"' || :muscle2 || '"%'))
+        OR (:muscle3 OR (primaryMuscles LIKE '%' || '["' || :muscle3 || '"]%' OR primaryMuscles LIKE '%' || ',"' || :muscle3 || '"%'
+                              OR secondaryMuscles LIKE '%' || '["' || :muscle3 || '"]%' OR secondaryMuscles LIKE '%' || ',"' || :muscle3 || '"%'))
+        OR (:muscle4 OR (primaryMuscles LIKE '%' || '["' || :muscle4 || '"]%' OR primaryMuscles LIKE '%' || ',"' || :muscle4 || '"%'
+                              OR secondaryMuscles LIKE '%' || '["' || :muscle4 || '"]%' OR secondaryMuscles LIKE '%' || ',"' || :muscle4 || '"%'))
+        OR (:muscle5 OR (primaryMuscles LIKE '%' || '["' || :muscle5 || '"]%' OR primaryMuscles LIKE '%' || ',"' || :muscle5 || '"%'
+                              OR secondaryMuscles LIKE '%' || '["' || :muscle5 || '"]%' OR secondaryMuscles LIKE '%' || ',"' || :muscle5 || '"%'))
+        OR (:muscle6 OR (primaryMuscles LIKE '%' || '["' || :muscle6 || '"]%' OR primaryMuscles LIKE '%' || ',"' || :muscle6 || '"%'
+                              OR secondaryMuscles LIKE '%' || '["' || :muscle6 || '"]%' OR secondaryMuscles LIKE '%' || ',"' || :muscle6 || '"%'))
+        OR (:muscle7 OR (primaryMuscles LIKE '%' || '["' || :muscle7 || '"]%' OR primaryMuscles LIKE '%' || ',"' || :muscle7 || '"%'
+                              OR secondaryMuscles LIKE '%' || '["' || :muscle7 || '"]%' OR secondaryMuscles LIKE '%' || ',"' || :muscle7 || '"%'))
+    )
+""")
+    suspend fun searchWithAnyMuscle(
+        search: String? = null,
+        muscle1: String? = null,
+        muscle2: String? = null,
+        muscle3: String? = null,
+        muscle4: String? = null,
+        muscle5: String? = null,
+        muscle6: String? = null,
+        muscle7: String? = null,
+    ): List<ExerciseDetails>
+
+
+
+
+
+
+
+    @Query("""
         SELECT * FROM exercise_details 
         WHERE LOWER(name) LIKE '%' || LOWER(:search) || '%'
-        AND (:muscles IS NULL OR primaryMuscles IN (:muscles) OR secondaryMuscles IN (:muscles))
+        AND (:muscles IS NULL OR 
+            (primaryMuscles IN (:muscles) 
+            OR secondaryMuscles IN (:muscles)))
         AND (:equipment IS NULL OR equipment LIKE '%' || :equipment || '%')
         AND (:level IS NULL OR level LIKE '%' || :level || '%')
         AND (:force IS NULL OR force LIKE '%' || :force || '%')
         AND (:mechanic IS NULL OR mechanic LIKE '%' || :mechanic || '%')
         AND (:category IS NULL OR category LIKE '%' || :category || '%')
     """)
-    suspend fun searchWithFilters(
+    suspend fun searchWithAllMuscles(
         search: String? = null,
         muscles: List<String>? = null,
         equipment: String? = null,
