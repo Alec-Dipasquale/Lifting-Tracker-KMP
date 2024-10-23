@@ -9,6 +9,10 @@ object Icons {
     object Custom {
         @Composable
         fun MyHistory() = ImageVector.vectorResource(id = com.squalec.liftingtracker.android.R.drawable.history_icon)
+        @Composable
+        fun WeightBarIcon() = ImageVector.vectorResource(id = com.squalec.liftingtracker.android.R.drawable.weight_dumbell_icon)
+        @Composable
+        fun LiftingLedgerIcon() = ImageVector.vectorResource(id = com.squalec.liftingtracker.android.R.drawable.lifting_ledger_icon)
 
     }
 }

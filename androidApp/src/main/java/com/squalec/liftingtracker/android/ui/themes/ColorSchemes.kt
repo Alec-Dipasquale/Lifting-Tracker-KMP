@@ -1,25 +1,48 @@
 package com.squalec.liftingtracker.android.ui.themes
 
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 
+//nikkis colors
+val darkBackground = Color(0xFF151531) // background
+val darkText = Color(0xFF452e8c) // regular text
+val bannerContainerColor = Color(0xFF4c5aa8) // banner color
+val primaryButtonContainer = Color(0xFF55b9e9) // button and accents
+val secondaryContainerColor = Color(0xFF9360A8) // secondary title color
+
 val darkColorScheme = darkColorScheme(
-    primary = Color(0xFF695AC4),
-    secondary = Color(0xFFE48A6B),
-    tertiary = Color(0xFF694CA8),
-    background = Color(0xFF121212),
-    surface = Color(0xFF121212),
-    onSurface = Color(0xFFFFFFFF),
+    primary = primaryButtonContainer,
+    secondary = secondaryContainerColor,
+    background = darkBackground,
+    surface = Color(0xFFECECEC),
+    onSurface = darkText,
     onBackground = Color(0xFFFFFFFF),
 )
 
 val  lightColorScheme = lightColorScheme(
-    primary = Color(0xFF359BD6),
-    secondary = Color(0xFFFDAB66),
-    tertiary = Color(0xFF5B38A8),
-    background = Color(0xFFE4E3E3),
-    surface = Color(0xFFF0F0F0),
-    onSurface = Color(0xFF000000),
-    onBackground = Color(0xFF000000),
+    primary = primaryButtonContainer,
+    secondary = secondaryContainerColor,
+    background = darkBackground,
+    surface = Color(0xFFECECEC),
+    onSurface = darkText,
+    onBackground = Color(0xFFFFFFFF),
 )
+
+val myColorSchemeLight = MyColorScheme(
+    materialColorScheme = lightColorScheme,
+    bannerContainerColor = bannerContainerColor
+)
+
+val myColorSchemeDark = MyColorScheme(
+    materialColorScheme = darkColorScheme,
+    bannerContainerColor = bannerContainerColor
+)
+
+data class MyColorScheme(
+    val materialColorScheme: ColorScheme,
+    val bannerContainerColor: Color
+)
+

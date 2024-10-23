@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -37,9 +38,10 @@ fun HomeScreen(navController: NavController) {
             .fillMaxSize()
             .padding(top = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-
         ) {
-        Box(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)) {
             IconButton(
 
                 onClick = {
@@ -51,6 +53,9 @@ fun HomeScreen(navController: NavController) {
                     contentDescription = ""
                 )
             }
+
+
+
             Box(
                 modifier = Modifier
                     .size(150.dp)
