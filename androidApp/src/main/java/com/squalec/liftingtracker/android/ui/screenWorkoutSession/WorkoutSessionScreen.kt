@@ -3,6 +3,7 @@ package com.squalec.liftingtracker.android.ui.screenWorkoutSession
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,6 +33,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -85,14 +87,15 @@ fun WorkoutSessionScreen(
             CircularProgressIndicator(progress = 0.5f)
         }
     } else {
-        WorkoutSessionLazyColumn(
-            state = state,
-            workoutManagerState = workoutManagerState,
-            onIntent = {
-                viewModel.handleEvent(it)
-            },
-            navController = navController
-        )
+
+            WorkoutSessionLazyColumn(
+                state = state,
+                workoutManagerState = workoutManagerState,
+                onIntent = {
+                    viewModel.handleEvent(it)
+                },
+                navController = navController
+            )
     }
 
 
@@ -120,11 +123,29 @@ fun WorkoutSessionLazyColumn(
         .fillMaxSize()) {
         // Display workout session
         item {
-            DateTitle(
-                date = state.date,
-            )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.primary)
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "Lifting Ledger".uppercase(),
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold
+                        ),
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                    DateTitle(
+                        date = state.date,
+                    )
+                }
 
-            UserTitle(text = state.workoutSessionModel?.workoutName?:"Workout",onIntent, state.isFinished)
+                UserTitle(
+                    text = state.workoutSessionModel?.workoutName ?: "Workout",
+                    onIntent,
+                    state.isFinished
+                )
         }
         state.workoutSessionModel?.exercises?.let { exercises ->
             item {
@@ -168,7 +189,7 @@ fun WorkoutSessionLazyColumn(
 @Composable
 fun UserTitle(text:String, onIntent: (WorkoutSessionEvent) -> Unit, finished: Boolean) {
     var title by remember {
-        mutableStateOf(TextFieldValue(text))
+        mutableStateOf(TextFieldValue(text.uppercase()))
     }
     var isFirstFocus by remember { mutableStateOf(false) }
 
@@ -177,55 +198,71 @@ fun UserTitle(text:String, onIntent: (WorkoutSessionEvent) -> Unit, finished: Bo
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        if(finished) {
+        if (finished) {
             Text(
                 text = title.text,
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onBackground
             )
         } else {
-            TextField(
-                modifier = Modifier
+            Column(modifier = Modifier
+                .fillMaxWidth()
+                .clip(shape = RoundedCornerShape(8.dp))
+                .background(MaterialTheme.colorScheme.surface)
+            ) {
+                Box(modifier = Modifier
                     .fillMaxWidth()
-                    .clip(shape = RoundedCornerShape(4.dp))
-                    .onFocusChanged { focusState ->
-                        if (!focusState.isFocused) {
-                            title = title.copy(
-                                selection = TextRange(0, 0)
+                    .background(MaterialTheme.colorScheme.secondary)
+                    .padding(16.dp)
+                ) {
+                    Text(
+                        text = "Workout Title:".uppercase(),
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold
+                        ),
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                }
+                TextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .onFocusChanged { focusState ->
+                            if (!focusState.isFocused) {
+                                title = title.copy(
+                                    selection = TextRange(0, 0)
+                                )
+                                onIntent(
+                                    WorkoutSessionEvent.ChangeWorkoutTitle(title.text.uppercase())
+                                )
+                            } else {
+                                title = title.copy(
+                                    selection = TextRange(0, title.text.length)
+                                )
+                                isFirstFocus = true
+                            }
+                        },
+                    value = title, onValueChange = { newValue ->
+
+                        if (isFirstFocus) {
+                            title = newValue.copy(
+                                text = newValue.text,
+                                selection = TextRange(0, newValue.text.length)
+                            )
+                            isFirstFocus = false
+
+                        } else {
+                            title = newValue.copy(
+                                text = newValue.text,
+                                selection = newValue.selection
                             )
                             onIntent(
                                 WorkoutSessionEvent.ChangeWorkoutTitle(title.text)
                             )
-                        } else {
-                            title = title.copy(
-                                selection = TextRange(0, title.text.length)
-                            )
-                            isFirstFocus = true
                         }
                     },
-                value = title, onValueChange = { newValue ->
-
-                    if (isFirstFocus) {
-                        title = newValue.copy(
-                            text = newValue.text,
-                            selection = TextRange(0, newValue.text.length)
-                        )
-                        isFirstFocus = false
-
-                    } else {
-                        title = newValue.copy(
-                            text = newValue.text,
-                            selection = newValue.selection
-                        )
-                        onIntent(
-                            WorkoutSessionEvent.ChangeWorkoutTitle(title.text)
-                        )
-                    } },
-                label = {
-                    Text("Workout Title")
-                },
-                textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground)
-            )
+                    textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)
+                )
+            }
         }
     }
 }
@@ -314,12 +351,11 @@ fun DateTitle(date: CustomDate?) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
     ) {
         Text(
             modifier = Modifier.align(Alignment.Center),
             text = date?.displayFormat() ?: "Unknown",
-            style = MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.onBackground
         )
     }
