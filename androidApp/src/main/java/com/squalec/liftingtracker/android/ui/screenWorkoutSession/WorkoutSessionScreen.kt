@@ -39,6 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.squalec.liftingtracker.android.ui.components.BackgroundDefault
 import com.squalec.liftingtracker.android.ui.components.ExerciseItemCard
 import com.squalec.liftingtracker.android.ui.components.StopWorkoutButton
 import com.squalec.liftingtracker.android.ui.utilities.clearAllFocusOnTap
@@ -61,9 +62,9 @@ fun WorkoutSessionScreen(
     workoutSessionId: String? = null,
     viewModel: WorkoutSessionViewModel = koinViewModel()
 ) {
+
     val state by viewModel.state.collectAsState()
     val workoutManagerState by WorkoutSessionManager.workoutState.collectAsState()
-
 
     LaunchedEffect(key1 = date) {
         if (date != null && !workoutManagerState.isWorkoutInProgress && workoutSessionId == null) {
@@ -82,11 +83,14 @@ fun WorkoutSessionScreen(
             viewModel.handleEvent(WorkoutSessionEvent.OnAddExercise(addedExerciseId))
         }
     }
-    if(state.isLoading){
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator(progress = 0.5f)
-        }
-    } else {
+    BackgroundDefault {
+        if (state.isLoading) {
+
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(progress = 0.5f)
+            }
+
+        } else {
 
             WorkoutSessionLazyColumn(
                 state = state,
@@ -96,6 +100,7 @@ fun WorkoutSessionScreen(
                 },
                 navController = navController
             )
+        }
     }
 
 

@@ -37,7 +37,7 @@ val myColorSchemeLight = MyColorScheme(
 )
 
 val myColorSchemeDark = MyColorScheme(
-    materialColorScheme = darkColorScheme,
+    materialColorScheme = lightColorScheme,
     bannerContainerColor = bannerContainerColor
 )
 

@@ -38,6 +38,7 @@ import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import androidx.wear.compose.material.ContentAlpha
+import com.squalec.liftingtracker.android.ui.components.BackgroundDefault
 import com.squalec.liftingtracker.android.ui.components.DropDownMuscleSelector
 import com.squalec.liftingtracker.android.ui.navigation.Destination
 import com.squalec.liftingtracker.android.ui.utilities.ShadowTypes
@@ -52,100 +53,106 @@ fun ExerciseSearchScreen(
 ) {
     val viewModel: ExerciseSearchViewModel = koinViewModel()
     val state by viewModel.state.collectAsState()
-
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        // Header section with TextField and DropDownMuscleSelector
+    BackgroundDefault {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(top = 16.dp)
-                .zIndex(1f) // Ensure it stays on top of the list when scrolling
+            modifier = Modifier.fillMaxSize()
         ) {
-            TextField(
-                value = state.searchText,
-                onValueChange = {
-                    viewModel.intent(ExerciseSearchIntent.SearchExercises(it))
-                },
-                label = { Text("Search Exercises") },
-                placeholder = { Text("Enter exercise name") },
+            // Header section with TextField and DropDownMuscleSelector
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .align(Alignment.CenterHorizontally)
-                    .padding(top = 8.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(MaterialTheme.colorScheme.surface)
-                ,
-                leadingIcon = {
-                    Icon(imageVector = Icons.Default.Search, contentDescription = "Search Icon")
-                },
-                singleLine = true,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = ContentAlpha.medium),
-                    focusedLabelColor = MaterialTheme.colorScheme.primary,
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(top = 16.dp)
+                    .zIndex(1f) // Ensure it stays on top of the list when scrolling
+            ) {
+                TextField(
+                    value = state.searchText,
+                    onValueChange = {
+                        viewModel.intent(ExerciseSearchIntent.SearchExercises(it))
+                    },
+                    label = { Text("Search Exercises") },
+                    placeholder = { Text("Enter exercise name") },
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .align(Alignment.CenterHorizontally)
+                        .padding(top = 8.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(MaterialTheme.colorScheme.surface),
+                    leadingIcon = {
+                        Icon(imageVector = Icons.Default.Search, contentDescription = "Search Icon")
+                    },
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = ContentAlpha.medium),
+                        focusedLabelColor = MaterialTheme.colorScheme.primary,
+                    )
                 )
-            )
-            Spacer(modifier = Modifier.height(16.dp))
 
-            DropDownMuscleSelector(
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .align(Alignment.CenterHorizontally),
-                muscleNames = state.muscleNames ?: emptyList(),
-                selectedMuscles = state.filters.muscle ?: emptyList(),
-                onMuscleClicked = { musclesSelected ->
-                    viewModel.intent(
-                        ExerciseSearchIntent.UpdateFilter(
-                            ExerciseFilters(
-                                muscle = musclesSelected
+                Spacer(modifier = Modifier.height(16.dp))
+
+                DropDownMuscleSelector(
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .align(Alignment.CenterHorizontally),
+                    muscleNames = state.muscleNames ?: emptyList(),
+                    selectedMuscles = state.filters.muscle ?: emptyList(),
+                    onMuscleClicked = { musclesSelected ->
+                        viewModel.intent(
+                            ExerciseSearchIntent.UpdateFilter(
+                                ExerciseFilters(
+                                    muscle = musclesSelected
+                                )
                             )
                         )
-                    )
-                },
-                onIntent = { viewModel.intent(it) },
-                filterState = state.muscleFilterState
-            )
-        }
+                    },
+                    onIntent = { viewModel.intent(it) },
+                    filterState = state.muscleFilterState
+                )
+                Icons
+            }
 
-        // Scrollable exercise list
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 16.dp)
-                .padding(horizontal = 24.dp)
-        ) {
-            items(state.exercises) { exercise ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
-                        .customShadow(ShadowTypes.medium)
-                        .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(8.dp))
-                        .clickable {
-                            if (isOnClickExerciseEnabled) {
-                                navController.navigate(Destination.WorkoutSession(addedExerciseId = exercise.id)) {
-                                    popUpTo(Destination.WorkoutSession()) {
-                                        inclusive = true
+            // Scrollable exercise list
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 16.dp)
+                    .padding(horizontal = 24.dp)
+            ) {
+                items(state.exercises) { exercise ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                            .customShadow(ShadowTypes.medium)
+                            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(8.dp))
+                            .clickable {
+                                if (isOnClickExerciseEnabled) {
+                                    navController.navigate(
+                                        Destination.WorkoutSession(
+                                            addedExerciseId = exercise.id
+                                        )
+                                    ) {
+                                        popUpTo(Destination.WorkoutSession()) {
+                                            inclusive = true
+                                        }
                                     }
                                 }
                             }
-                        }
-                        .padding(8.dp)
-                ) {
-                    Text(
-                        modifier = Modifier.weight(0.6f),
-                        text = exercise.name
-                    )
-                    Icon(
-                        modifier = Modifier.clickable {
-                            navController.navigate(Destination.ExerciseDetail(exercise.id))
-                        },
-                        imageVector = Icons.Default.Info,
-                        contentDescription = "Exercise Details"
-                    )
+                            .padding(8.dp)
+                    ) {
+                        Text(
+                            modifier = Modifier.weight(0.6f),
+                            text = exercise.name
+                        )
+                        Icon(
+                            modifier = Modifier.clickable {
+                                navController.navigate(Destination.ExerciseDetail(exercise.id))
+                            },
+                            imageVector = Icons.Default.Info,
+                            contentDescription = "Exercise Details"
+                        )
+                    }
                 }
             }
         }

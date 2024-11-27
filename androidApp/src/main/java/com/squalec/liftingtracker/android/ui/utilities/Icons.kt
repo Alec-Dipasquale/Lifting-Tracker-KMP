@@ -13,6 +13,8 @@ object Icons {
         fun WeightBarIcon() = ImageVector.vectorResource(id = com.squalec.liftingtracker.android.R.drawable.weight_dumbell_icon)
         @Composable
         fun LiftingLedgerIcon() = ImageVector.vectorResource(id = com.squalec.liftingtracker.android.R.drawable.lifting_ledger_icon)
+        @Composable
+        fun DefaultBackground() = ImageVector.vectorResource(id = com.squalec.liftingtracker.android.R.drawable.lifting_ledger_moblie_pattern_01)
 
     }
 }

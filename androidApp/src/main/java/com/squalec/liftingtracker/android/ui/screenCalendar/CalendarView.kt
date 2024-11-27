@@ -22,6 +22,7 @@ import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
+import com.squalec.liftingtracker.android.ui.components.BackgroundDefault
 import com.squalec.liftingtracker.android.ui.components.CalendarWorkoutsDialogue
 import com.squalec.liftingtracker.android.ui.themes.CalendarViewTheme
 import com.squalec.liftingtracker.appdatabase.models.ExerciseDetails
@@ -65,17 +66,19 @@ fun CalendarView(
         firstDayOfWeek = firstDayOfWeek
     )
 
-    CalendarViewContent(
-        calendarState,
-        state,
-        onIntent = { day, workoutSessions ->
-            viewModel.intent(
-                CalendarIntent.OnDaySelected(
-                    day.formatToCustomDate(),
-                    workoutSessions
+    BackgroundDefault {
+        CalendarViewContent(
+            calendarState,
+            state,
+            onIntent = { day, workoutSessions ->
+                viewModel.intent(
+                    CalendarIntent.OnDaySelected(
+                        day.formatToCustomDate(),
+                        workoutSessions
+                    )
                 )
-            )
-        })
+            })
+    }
 
 
     if (state.calendarWorkoutDialogueState.isWorkoutsDialogueOpen) {
