@@ -62,6 +62,8 @@ fun DropDownMuscleSelector(
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = if (selectedMuscles.isEmpty()) "Select muscles" else selectedMuscles.joinToString(),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
 

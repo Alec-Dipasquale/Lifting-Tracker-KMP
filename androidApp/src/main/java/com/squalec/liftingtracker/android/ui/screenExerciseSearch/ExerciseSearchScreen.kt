@@ -41,10 +41,12 @@ import androidx.wear.compose.material.ContentAlpha
 import com.squalec.liftingtracker.android.ui.components.BackgroundDefault
 import com.squalec.liftingtracker.android.ui.components.DropDownMuscleSelector
 import com.squalec.liftingtracker.android.ui.navigation.Destination
+import com.squalec.liftingtracker.android.ui.themes.SearchExercisesTheme
 import com.squalec.liftingtracker.android.ui.utilities.ShadowTypes
 import com.squalec.liftingtracker.android.ui.utilities.customShadow
+import com.squalec.liftingtracker.appdatabase.models.ExerciseDetails
+import com.squalec.liftingtracker.appdatabase.repositories.Operator
 import org.koin.androidx.compose.koinViewModel
-
 
 @Composable
 fun ExerciseSearchScreen(
@@ -53,23 +55,60 @@ fun ExerciseSearchScreen(
 ) {
     val viewModel: ExerciseSearchViewModel = koinViewModel()
     val state by viewModel.state.collectAsState()
+
+    ExerciseSearchContent(
+        state = state,
+        isOnClickExerciseEnabled = isOnClickExerciseEnabled,
+        onSearchTextChanged = { searchText ->
+            viewModel.intent(ExerciseSearchIntent.SearchExercises(searchText))
+        },
+        onMuscleFilterUpdated = { musclesSelected ->
+            viewModel.intent(
+                ExerciseSearchIntent.UpdateFilter(
+                    ExerciseFilters(muscle = musclesSelected)
+                )
+            )
+        },
+        onExerciseClicked = { exerciseId ->
+            if (isOnClickExerciseEnabled) {
+                navController.navigate(
+                    Destination.WorkoutSession(addedExerciseId = exerciseId)
+                ) {
+                    popUpTo(Destination.WorkoutSession()) {
+                        inclusive = true
+                    }
+                }
+            }
+        },
+        onExerciseDetailsClicked = { exerciseId ->
+            navController.navigate(Destination.ExerciseDetail(exerciseId))
+        }
+    )
+}
+
+@Composable
+fun ExerciseSearchContent(
+    state: ExerciseSearchState,
+    isOnClickExerciseEnabled: Boolean,
+    onSearchTextChanged: (String) -> Unit,
+    onMuscleFilterUpdated: (List<String>) -> Unit,
+    onExerciseClicked: (String) -> Unit,
+    onExerciseDetailsClicked: (String) -> Unit
+) {
     BackgroundDefault {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            // Header section with TextField and DropDownMuscleSelector
+            // Header section
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.background)
                     .padding(top = 16.dp)
-                    .zIndex(1f) // Ensure it stays on top of the list when scrolling
+                    .zIndex(1f)
             ) {
                 TextField(
                     value = state.searchText,
-                    onValueChange = {
-                        viewModel.intent(ExerciseSearchIntent.SearchExercises(it))
-                    },
+                    onValueChange = onSearchTextChanged,
                     label = { Text("Search Exercises") },
                     placeholder = { Text("Enter exercise name") },
                     modifier = Modifier
@@ -97,58 +136,39 @@ fun ExerciseSearchScreen(
                         .align(Alignment.CenterHorizontally),
                     muscleNames = state.muscleNames ?: emptyList(),
                     selectedMuscles = state.filters.muscle ?: emptyList(),
-                    onMuscleClicked = { musclesSelected ->
-                        viewModel.intent(
-                            ExerciseSearchIntent.UpdateFilter(
-                                ExerciseFilters(
-                                    muscle = musclesSelected
-                                )
-                            )
-                        )
-                    },
-                    onIntent = { viewModel.intent(it) },
+                    onMuscleClicked = onMuscleFilterUpdated,
+                    onIntent = {},
                     filterState = state.muscleFilterState
                 )
-                Icons
             }
 
-            // Scrollable exercise list
+            // Exercise list
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = 16.dp)
-                    .padding(horizontal = 24.dp)
+                    .padding(top = 16.dp, start = 24.dp, end = 24.dp)
             ) {
                 items(state.exercises) { exercise ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(8.dp)
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
                             .customShadow(ShadowTypes.medium)
                             .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(8.dp))
-                            .clickable {
-                                if (isOnClickExerciseEnabled) {
-                                    navController.navigate(
-                                        Destination.WorkoutSession(
-                                            addedExerciseId = exercise.id
-                                        )
-                                    ) {
-                                        popUpTo(Destination.WorkoutSession()) {
-                                            inclusive = true
-                                        }
-                                    }
-                                }
-                            }
-                            .padding(8.dp)
+                            .clickable { onExerciseClicked(exercise.id) }
+                            .padding(16.dp)
                     ) {
                         Text(
                             modifier = Modifier.weight(0.6f),
-                            text = exercise.name
+                            text = exercise.name,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                         Icon(
                             modifier = Modifier.clickable {
-                                navController.navigate(Destination.ExerciseDetail(exercise.id))
+                                onExerciseDetailsClicked(exercise.id)
                             },
+                            tint = MaterialTheme.colorScheme.onSurface,
                             imageVector = Icons.Default.Info,
                             contentDescription = "Exercise Details"
                         )
@@ -160,8 +180,66 @@ fun ExerciseSearchScreen(
 }
 
 
-@Preview
+
+@Preview(showBackground = true)
 @Composable
-fun ExerciseSearchScreenPreview() {
-    ExerciseSearchScreen(navController = rememberNavController(), isOnClickExerciseEnabled = true)
+fun ExerciseSearchContentPreview() {
+    val mockState = ExerciseSearchState(
+        searchText = "",
+        muscleNames = listOf("Chest", "Back", "Legs"),
+        filters = ExerciseFilters(muscle = listOf("Chest")),
+        exercises = listOf(
+            ExerciseDetails(
+                id = "1",
+                name = "Bench Press",
+                primaryMuscles = listOf("Chest"),
+                secondaryMuscles = listOf("Triceps"),
+                equipment = "Barbell",
+                force = "Push",
+                level = "Intermediate",
+                mechanic = "Compound",
+                instructions = listOf("Instructions"),
+                category = "Chest",
+                images = emptyList()
+            ),
+            ExerciseDetails(
+                id = "2",
+                name = "Deadlift",
+                primaryMuscles = listOf("Back"),
+                secondaryMuscles = listOf("Hamstrings"),
+                equipment = "Barbell",
+                force = "Pull",
+                level = "Intermediate",
+                mechanic = "Compound",
+                instructions = listOf("Instructions"),
+                category = "Back",
+                images = emptyList()
+            ),
+            ExerciseDetails(
+                id = "3",
+                name = "Squat",
+                primaryMuscles = listOf("Legs"),
+                secondaryMuscles = listOf("Glutes"),
+                equipment = "Barbell",
+                force = "Push",
+                level = "Intermediate",
+                mechanic = "Compound",
+                instructions = listOf("Instructions"),
+                category = "Legs",
+                images = emptyList()
+            )
+        ),
+        muscleFilterState = MuscleFilterState()
+    )
+
+    SearchExercisesTheme {
+        ExerciseSearchContent(
+            state = mockState,
+            isOnClickExerciseEnabled = true,
+            onSearchTextChanged = {},
+            onMuscleFilterUpdated = {},
+            onExerciseClicked = {},
+            onExerciseDetailsClicked = {}
+        )
+    }
 }
