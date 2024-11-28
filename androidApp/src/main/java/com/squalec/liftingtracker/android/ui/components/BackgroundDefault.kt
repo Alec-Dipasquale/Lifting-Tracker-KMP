@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
-import com.squalec.liftingtracker.android.ui.utilities.Icons
+import com.squalec.liftingtracker.android.ui.utilities.LedgerIcons
 
 @Composable
 fun BackgroundDefault(
@@ -22,7 +22,7 @@ fun BackgroundDefault(
         modifier = Modifier.fillMaxSize().background(backgroundColor),
     ) {
         Image(
-            imageVector = Icons.Custom.DefaultBackground(),
+            imageVector = LedgerIcons.Custom.DefaultBackground(),
             colorFilter = ColorFilter.tint(tint),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),

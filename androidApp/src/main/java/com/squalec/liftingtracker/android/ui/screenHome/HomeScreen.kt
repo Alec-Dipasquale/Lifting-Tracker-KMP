@@ -17,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -28,7 +27,7 @@ import androidx.navigation.compose.rememberNavController
 import com.squalec.liftingtracker.android.ui.components.BackgroundDefault
 import com.squalec.liftingtracker.android.ui.navigation.Destination
 import com.squalec.liftingtracker.android.ui.navigation.TabDestinations
-import com.squalec.liftingtracker.android.ui.utilities.Icons
+import com.squalec.liftingtracker.android.ui.utilities.LedgerIcons
 import com.squalec.liftingtracker.appdatabase.WorkoutSessionManager
 import com.squalec.liftingtracker.utils.CustomDate
 
@@ -53,7 +52,7 @@ fun HomeScreen(navController: NavController) {
                     }) {
                     Icon(
                         modifier = Modifier.size(48.dp),
-                        imageVector = Icons.Custom.MyHistory(),
+                        imageVector = LedgerIcons.Custom.MyHistory(),
                         contentDescription = ""
                     )
                 }
