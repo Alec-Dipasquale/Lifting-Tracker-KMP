@@ -62,18 +62,17 @@ class ExerciseDetailsRepositoryImpl(
         category: String?,
         operatorFilter: Operator
     ): List<ExerciseDetails> {
+        val results: List<ExerciseDetails>
+        val muscle1 = muscles?.getOrNull(0)
+        val muscle2 = muscles?.getOrNull(1)
+        val muscle3 = muscles?.getOrNull(2)
+        val muscle4 = muscles?.getOrNull(3)
+        val muscle5 = muscles?.getOrNull(4)
+        val muscle6 = muscles?.getOrNull(5)
+        val muscle7 = muscles?.getOrNull(6)
         if (operatorFilter == Operator.OR) {
-            // Extract up to 17 muscles from the list, or null if not available
-            val muscle1 = muscles?.getOrNull(0)
-            val muscle2 = muscles?.getOrNull(1)
-            val muscle3 = muscles?.getOrNull(2)
-            val muscle4 = muscles?.getOrNull(3)
-            val muscle5 = muscles?.getOrNull(4)
-            val muscle6 = muscles?.getOrNull(5)
-            val muscle7 = muscles?.getOrNull(6)
-
             // Call the DAO method with the extracted muscles and other filters
-            return exerciseDetailsDao.searchWithAnyMuscle(
+            results = exerciseDetailsDao.searchWithAnyMuscle(
                 search = search,
                 muscle1 = muscle1,
                 muscle2 = muscle2,
@@ -91,9 +90,16 @@ class ExerciseDetailsRepositoryImpl(
         } else {
             // Implement behavior for other operators if necessary
             // For example, handling AND operator logic
-            return exerciseDetailsDao.searchWithAllMuscles(
+
+            results =  exerciseDetailsDao.searchWithAllMuscles(
                 search = search,
-                muscles = muscles,
+                muscle1 = muscle1,
+                muscle2 = muscle2,
+                muscle3 = muscle3,
+                muscle4 = muscle4,
+                muscle5 = muscle5,
+                muscle6 = muscle6,
+                muscle7 = muscle7,
                 equipment = equipment,
                 level = level,
                 force = force,
@@ -102,6 +108,10 @@ class ExerciseDetailsRepositoryImpl(
 
             )
         }
+
+        Logs().debug("Search results from local db: $results")
+
+        return results
     }
 
     override suspend fun getExerciseDetails(id: String): ExerciseDetails? {
