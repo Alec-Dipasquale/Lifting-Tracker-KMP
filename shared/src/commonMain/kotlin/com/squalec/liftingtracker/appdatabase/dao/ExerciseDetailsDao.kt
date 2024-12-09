@@ -82,27 +82,53 @@ interface ExerciseDetailDao {
 
 
 
+
     @Query("""
-        SELECT * FROM exercise_details 
-        WHERE LOWER(name) LIKE '%' || LOWER(:search) || '%'
-        AND (:muscles IS NULL OR 
-            (primaryMuscles IN (:muscles) 
-            OR secondaryMuscles IN (:muscles)))
-        AND (:equipment IS NULL OR equipment LIKE '%' || :equipment || '%')
-        AND (:level IS NULL OR level LIKE '%' || :level || '%')
-        AND (:force IS NULL OR force LIKE '%' || :force || '%')
-        AND (:mechanic IS NULL OR mechanic LIKE '%' || :mechanic || '%')
-        AND (:category IS NULL OR category LIKE '%' || :category || '%')
-    """)
+    SELECT * FROM exercise_details 
+    WHERE LOWER(name) LIKE '%' || LOWER(:search) || '%'
+    AND (:muscle1 IS NULL OR 
+        (LOWER(primaryMuscles) LIKE '%' || LOWER(:muscle1) || '%' 
+        OR LOWER(secondaryMuscles) LIKE '%' || LOWER(:muscle1) || '%'))
+    AND (:muscle2 IS NULL OR 
+        (LOWER(primaryMuscles) LIKE '%' || LOWER(:muscle2) || '%' 
+        OR LOWER(secondaryMuscles) LIKE '%' || LOWER(:muscle2) || '%'))
+    AND (:muscle3 IS NULL OR 
+        (LOWER(primaryMuscles) LIKE '%' || LOWER(:muscle3) || '%' 
+        OR LOWER(secondaryMuscles) LIKE '%' || LOWER(:muscle3) || '%'))
+    AND (:muscle4 IS NULL OR 
+        (LOWER(primaryMuscles) LIKE '%' || LOWER(:muscle4) || '%' 
+        OR LOWER(secondaryMuscles) LIKE '%' || LOWER(:muscle4) || '%'))
+    AND (:muscle5 IS NULL OR 
+        (LOWER(primaryMuscles) LIKE '%' || LOWER(:muscle5) || '%' 
+        OR LOWER(secondaryMuscles) LIKE '%' || LOWER(:muscle5) || '%'))
+    AND (:muscle6 IS NULL OR 
+        (LOWER(primaryMuscles) LIKE '%' || LOWER(:muscle6) || '%' 
+        OR LOWER(secondaryMuscles) LIKE '%' || LOWER(:muscle6) || '%'))
+    AND (:muscle7 IS NULL OR 
+        (LOWER(primaryMuscles) LIKE '%' || LOWER(:muscle7) || '%' 
+        OR LOWER(secondaryMuscles) LIKE '%' || LOWER(:muscle7) || '%'))
+    AND (:equipment IS NULL OR equipment LIKE '%' || :equipment || '%')
+    AND (:level IS NULL OR level LIKE '%' || :level || '%')
+    AND (:force IS NULL OR force LIKE '%' || :force || '%')
+    AND (:mechanic IS NULL OR mechanic LIKE '%' || :mechanic || '%')
+    AND (:category IS NULL OR category LIKE '%' || :category || '%')
+""")
     suspend fun searchWithAllMuscles(
         search: String? = null,
-        muscles: List<String>? = null,
+        muscle1: String? = null,
+        muscle2: String? = null,
+        muscle3: String? = null,
+        muscle4: String? = null,
+        muscle5: String? = null,
+        muscle6: String? = null,
+        muscle7: String? = null,
         equipment: String? = null,
         level: String? = null,
         force: String? = null,
         mechanic: String? = null,
         category: String? = null
     ): List<ExerciseDetails>
+
 
     @Query("SELECT DISTINCT primaryMuscles FROM exercise_details")
     suspend fun getMuscleNames(): List<String>
