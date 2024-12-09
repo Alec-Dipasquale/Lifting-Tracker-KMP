@@ -58,7 +58,10 @@ fun DropDownMuscleSelector(
                 .clickable { expanded = !expanded },
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(Icons.Default.ArrowDropDown, contentDescription = "Expand muscles")
+            Icon(
+                Icons.Default.ArrowDropDown,
+                tint = MaterialTheme.colorScheme.onSurface,
+                contentDescription = "Expand muscles")
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = if (selectedMuscles.isEmpty()) "Select muscles" else selectedMuscles.joinToString(),
