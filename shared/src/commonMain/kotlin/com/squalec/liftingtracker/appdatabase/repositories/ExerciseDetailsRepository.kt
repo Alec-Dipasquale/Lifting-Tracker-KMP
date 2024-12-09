@@ -43,7 +43,7 @@ class ExerciseDetailsRepositoryImpl(
     override suspend fun muscleNames(): List<String> {
 
         val result = exerciseDetailsDao.getMuscleNames()
-        Logs().debug("Muscle names: $result")
+        Logs().debug("Grabbed muscle names from local db with ${result.size} results")
         val cleanedResult = result.map { it.replace("\"", "").replace("[", "").replace("]", "") }
         return cleanedResult
     }
@@ -109,7 +109,7 @@ class ExerciseDetailsRepositoryImpl(
             )
         }
 
-        Logs().debug("Search results from local db: $results")
+        Logs().debug("Search results Successful with filters returning ${results.size} results")
 
         return results
     }

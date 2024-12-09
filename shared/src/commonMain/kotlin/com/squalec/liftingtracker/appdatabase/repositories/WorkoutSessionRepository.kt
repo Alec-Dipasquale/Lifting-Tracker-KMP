@@ -29,7 +29,7 @@ class WorkoutSessionRepositoryImpl(
     private val userWorkoutSessionDao: UserWorkoutSessionDao,
     private val userExerciseDao: UserExerciseDao,
     private val userSetDao: UserSetDao,
-    private val exerciseDetailDao: ExerciseDetailDao
+    private val exerciseDetailDao: ExerciseDetailDao,
 ) : WorkoutSessionRepository {
     override suspend fun getWorkoutSessionByDate(date: CustomDate): WorkoutSessionModel {
         return userWorkoutSessionDao.getWorkoutSessionByDate(date.defaultFormat())
@@ -55,6 +55,9 @@ class WorkoutSessionRepositoryImpl(
     }
 
     override suspend fun saveWorkoutSession(workoutSessionModel: WorkoutSessionModel) {
+
+        Logs().debug("Saving workout session: ${workoutSessionModel.workoutName}")
+
         // Check for exercises
         if (workoutSessionModel.exercises.any { it.exercise?.id.isNullOrBlank() }) {
             throw IllegalArgumentException("All exercises must have a valid exercise ID")
@@ -137,11 +140,17 @@ class WorkoutSessionRepositoryImpl(
         setDao: UserSetDao,
         exerciseDetailDao: ExerciseDetailDao
     ): WorkoutSessionModel {
+        val metricType = when (metricType) {
+            "LB" -> WeightMetricTypes.LB
+            "KG" -> WeightMetricTypes.KG
+            else -> WeightMetricTypes.LB
+        }
         val exercises = exerciseDao.getUserExerciseDetailsForSession(id)
         return WorkoutSessionModel(
             workoutId = id.toString(),
             workoutName = workoutName,
             date = CustomDate(date),
+            metricType = metricType,
             exercises = exercises.map { exercise ->
                 val sets = setDao.getUserExerciseSetsForWorkout(exercise.id.toString())
                 ExerciseSessionModel(
@@ -173,9 +182,15 @@ data class WorkoutSessionModel(
             orderPosition = 0
         )
     ),
+    val metricType:WeightMetricTypes = WeightMetricTypes.LB,
     val duration: Long = 0,
     val caloriesBurned: Int = 0,
 )
+
+enum class WeightMetricTypes {
+    LB,
+    KG,
+}
 
 data class ExerciseSessionModel(
     val exercise: ExerciseDetails?,

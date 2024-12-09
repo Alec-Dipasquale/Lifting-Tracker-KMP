@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -76,7 +77,6 @@ fun SetRowItem(
                 onIntent = { position, text ->
                     onIntent(WorkoutSessionEvent.ChangeSetWeight(exercise, position, text.toFloat()))
                 },
-                exercise = exercise,
                 set = set
             )
             Text(text = "x")
@@ -90,7 +90,6 @@ fun SetRowItem(
                 onIntent = { position, text ->
                     onIntent(WorkoutSessionEvent.ChangeSetReps(exercise, position, text.toInt()))
                 },
-                exercise = exercise,
                 set = set
             )
         }
@@ -102,67 +101,63 @@ fun EditableSetTextField(
     text: String,
     isFinished: Boolean,
     onRepsChange: (String) -> Unit,
-    onIntent: (position:Int, text:String) -> Unit,
-    exercise: ExerciseSessionModel, // Assuming this is your Exercise data class or type
-    set: SetSessionModel // Assuming this is your Set data class or type
+    onIntent: (position: Int, text: String) -> Unit,
+    set: SetSessionModel? = null, // Assuming this is your Set data class or type
+    position: Int? = null
 ) {
-
-
     var textFieldValue by remember { mutableStateOf(TextFieldValue(text)) }
     var isFirstFocus by remember { mutableStateOf(false) }
+
+    val orderPosition = set?.orderPosition ?: position ?: 0
 
     if (isFinished) {
         Text(
             text = textFieldValue.text,
             modifier = Modifier
-                .width(90.dp)
+                .width(50.dp)
                 .clip(shape = RoundedCornerShape(4.dp)),
             style = MaterialTheme.typography.bodyMedium // Adjust style as needed
         )
     } else {
-        TextField(
+        BasicTextField(
+            value = textFieldValue,
+            onValueChange = { newValue ->
+                textFieldValue = newValue.copy(
+                    text = newValue.text,
+                    selection = if (isFirstFocus) {
+                        TextRange(0, newValue.text.length)
+                    } else {
+                        newValue.selection
+                    }
+                )
+                isFirstFocus = false
+            },
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = KeyboardType.Number
+            ),
+            textStyle = MaterialTheme.typography.bodyMedium,
             modifier = Modifier
-                .width(90.dp)
-                .clip(shape = RoundedCornerShape(4.dp))
+                .width(65.dp)
+                .clip(RoundedCornerShape(4.dp))
                 .onFocusChanged { focusState ->
-                    if (!focusState.isFocused) {
-                        textFieldValue = textFieldValue.copy(
-                            selection = TextRange(0, 0)
-                        )
-                        onIntent(
-                            set.orderPosition, textFieldValue.text
-                        )
-                    } else{
+                    if (focusState.isFocused) {
+                        // Highlight the entire text
                         textFieldValue = textFieldValue.copy(
                             selection = TextRange(0, textFieldValue.text.length)
                         )
                         isFirstFocus = true
+                    } else {
+                        // Clear selection when focus is lost
+                        textFieldValue = textFieldValue.copy(
+                            selection = TextRange(0, 0)
+                        )
+                        onIntent(orderPosition, textFieldValue.text)
                     }
-                },
-            value = textFieldValue,
-            onValueChange = { newValue ->
-                if (isFirstFocus) {
-                    textFieldValue = newValue.copy(
-                        text = newValue.text,
-                        selection = TextRange(0, newValue.text.length)
-                    )
-                    isFirstFocus = false
-
-                } else {
-                    textFieldValue = newValue.copy(
-                        text = newValue.text,
-                        selection = newValue.selection
-                    )
-                    onIntent(
-                        set.orderPosition, newValue.text
-                    )
                 }
-                onRepsChange(newValue.text)
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
     }
 }
+
 
 
 @Preview

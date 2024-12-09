@@ -26,6 +26,7 @@ import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
 import com.squalec.liftingtracker.android.ui.components.BackgroundDefault
 import com.squalec.liftingtracker.android.ui.components.CalendarWorkoutsDialogue
 import com.squalec.liftingtracker.android.ui.themes.CalendarViewTheme
+import com.squalec.liftingtracker.appdatabase.Logs
 import com.squalec.liftingtracker.appdatabase.models.ExerciseDetails
 import com.squalec.liftingtracker.appdatabase.repositories.ExerciseSessionModel
 import com.squalec.liftingtracker.appdatabase.repositories.WorkoutSessionModel
@@ -45,7 +46,7 @@ fun CalendarView(
     val startMonth = remember { currentMonth.minusMonths(24) } // Adjust as needed
     val endMonth = remember { currentMonth.plusMonths(24) } // Adjust as needed
     val firstDayOfWeek = remember { firstDayOfWeekFromLocale() } // Available from the library
-    Timber.d("Current month: $currentMonth and currentmonth: ${currentMonth.month.value}")
+    Logs().debug("Current month: $currentMonth and currentmonth: ${currentMonth.month.value}")
 
     val state by viewModel.state.collectAsState()
 
@@ -68,17 +69,17 @@ fun CalendarView(
     )
 
 
-        CalendarViewContent(
-            calendarState,
-            state,
-            onIntent = { day, workoutSessions ->
-                viewModel.intent(
-                    CalendarIntent.OnDaySelected(
-                        day.formatToCustomDate(),
-                        workoutSessions
-                    )
+    CalendarViewContent(
+        calendarState,
+        state,
+        onIntent = { day, workoutSessions ->
+            viewModel.intent(
+                CalendarIntent.OnDaySelected(
+                    day.formatToCustomDate(),
+                    workoutSessions
                 )
-            })
+            )
+        })
 
 
     if (state.calendarWorkoutDialogueState.isWorkoutsDialogueOpen) {
@@ -119,7 +120,7 @@ fun CalendarViewContent(
                     workoutSessionModel.date.formattedToDay() == day.formatToCustomDate()
                         .formattedToDay()
                 }
-                if(day.date.month == calendarState.firstVisibleMonth.yearMonth.month) {
+                if (day.date.month == calendarState.firstVisibleMonth.yearMonth.month) {
                     Day(
                         day = day,
                         workoutSessions = workoutSessions,

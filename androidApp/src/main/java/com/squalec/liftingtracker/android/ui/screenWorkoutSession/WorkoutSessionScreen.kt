@@ -41,6 +41,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.squalec.liftingtracker.android.ui.components.BackgroundDefault
 import com.squalec.liftingtracker.android.ui.components.ExerciseItemCard
+import com.squalec.liftingtracker.android.ui.components.ExerciseItemCard2
 import com.squalec.liftingtracker.android.ui.components.StopWorkoutButton
 import com.squalec.liftingtracker.android.ui.utilities.clearAllFocusOnTap
 import com.squalec.liftingtracker.android.ui.navigation.Destination
@@ -50,6 +51,7 @@ import com.squalec.liftingtracker.appdatabase.WorkoutSessionManager
 import com.squalec.liftingtracker.appdatabase.models.ExerciseDetails
 import com.squalec.liftingtracker.appdatabase.repositories.ExerciseSessionModel
 import com.squalec.liftingtracker.appdatabase.repositories.SetSessionModel
+import com.squalec.liftingtracker.appdatabase.repositories.WeightMetricTypes
 import com.squalec.liftingtracker.appdatabase.repositories.WorkoutSessionModel
 import com.squalec.liftingtracker.utils.CustomDate
 import org.koin.androidx.compose.koinViewModel
@@ -123,6 +125,7 @@ fun WorkoutSessionLazyColumn(
     navController: NavController
 ) {
     val focusManager = LocalFocusManager.current
+    val workoutWeightMetricType = state.workoutSessionModel?.metricType ?: WeightMetricTypes.LB
     LazyColumn(modifier = Modifier
         .clearAllFocusOnTap(focusManager)
         .fillMaxSize()) {
@@ -168,12 +171,41 @@ fun WorkoutSessionLazyColumn(
             }
 
             items(exercises) { exercise ->
-                ExerciseItemCard(
-                    isFinished = state.isFinished,
+
+                ExerciseItemCard2(
+                    modifier = Modifier.padding(horizontal = 8.dp),
                     exercise = exercise,
-                    onIntent = {
-                        onIntent(it)
-                    }
+                    onWeightChange = { weight, position,  ->
+                        onIntent(
+                            WorkoutSessionEvent.ChangeSetWeight(
+                                weight = weight,
+                                exercise = exercise,
+                                position = position,
+                            )
+                        )
+                    },
+                    onRepsChange = { reps, position ->
+                        onIntent(
+                        WorkoutSessionEvent.ChangeSetReps(
+                            reps = reps,
+                            exercise = exercise,
+                            position = position
+                        )
+                        )
+                    },
+                    onSetAdded = { setSessionModel ->
+                        onIntent(
+                            WorkoutSessionEvent.OnAddSet(
+                                setSessionModel,
+                                exerciseId = exercise.exercise?.id
+                                    ?: error("Exercise id is null")
+                            )
+                        )
+                    },
+                    onSetRemoved = {
+
+                    },
+                    weightMetric = workoutWeightMetricType
                 )
             }
         }
