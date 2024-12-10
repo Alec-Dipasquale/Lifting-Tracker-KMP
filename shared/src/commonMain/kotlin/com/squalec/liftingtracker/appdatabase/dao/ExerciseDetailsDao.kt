@@ -39,8 +39,8 @@ interface ExerciseDetailDao {
     @Query("SELECT * FROM exercise_details WHERE mechanic = :mechanic")
     suspend fun getExercisesByType(mechanic: String): List<ExerciseDetails>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertExercises(vararg exercises: ExerciseDetails)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertExercises(vararg exercises: ExerciseDetails): List<Long>
 
     @Query("SELECT * FROM exercise_details WHERE LOWER(name) LIKE '%' || LOWER(:search) || '%'")
     suspend fun searchExercises(search: String): List<ExerciseDetails>

@@ -298,6 +298,16 @@ class WorkoutSessionViewModel(
         }
         viewModelScope.launch(Dispatchers.IO) {
             val workoutSession = workoutSessionRepository.getWorkoutSessionById(workoutId)
+            if(workoutSession == null) {
+                Timber.e("Workout session not found")
+                _state.update {
+                    it.copy(
+                        error = "Workout session not found",
+                        isLoading = false
+                    )
+                }
+                return@launch
+            }
             _state.update {
                 it.copy(
                     workoutSessionModel = WorkoutSessionModel(
@@ -320,7 +330,8 @@ data class WorkoutSessionState(
     val date: CustomDate? = null,
     val workoutSessionModel: WorkoutSessionModel? = null,
     val isFinished: Boolean = false,
-    val isLoading : Boolean = false
+    val isLoading : Boolean = false,
+    val error: String = ""
 )
 
 sealed class WorkoutSessionEvent {

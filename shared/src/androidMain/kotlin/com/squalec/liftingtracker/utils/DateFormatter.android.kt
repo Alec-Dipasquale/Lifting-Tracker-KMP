@@ -1,5 +1,6 @@
 package com.squalec.liftingtracker.utils
 
+import com.squalec.liftingtracker.appdatabase.Logs
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.Month
 import java.text.ParseException
@@ -15,7 +16,7 @@ actual class CustomDate actual constructor(val utcDate: String) {
         try {
             dateFormat.parse(utcDate)
         } catch (e: ParseException) {
-            throw IllegalArgumentException("Invalid date format, expected format is $INIT_FORMAT")
+            Logs().error("Invalid date format, expected format is $INIT_FORMAT, current format is $utcDate")
         }
     }
 

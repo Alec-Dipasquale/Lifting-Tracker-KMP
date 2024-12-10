@@ -17,7 +17,7 @@ interface WorkoutSessionRepository {
     suspend fun getWorkoutSessionByDate(date: CustomDate): WorkoutSessionModel
     suspend fun getWorkoutSessionByRange(dateRange: CustomDateRange): List<WorkoutSessionModel>
     suspend fun getWorkoutSessionId(date: CustomDate): Long
-    suspend fun getWorkoutSessionById(workoutId: String): WorkoutSessionModel
+    suspend fun getWorkoutSessionById(workoutId: String): WorkoutSessionModel?
     suspend fun saveWorkoutSession(workoutSessionModel: WorkoutSessionModel)
     suspend fun addExerciseToWorkoutSession()
     suspend fun removeExerciseFromWorkoutSession()
@@ -32,75 +32,104 @@ class WorkoutSessionRepositoryImpl(
     private val exerciseDetailDao: ExerciseDetailDao,
 ) : WorkoutSessionRepository {
     override suspend fun getWorkoutSessionByDate(date: CustomDate): WorkoutSessionModel {
-        return userWorkoutSessionDao.getWorkoutSessionByDate(date.defaultFormat())
-            .toWorkoutSessionModel(userExerciseDao, userSetDao, exerciseDetailDao)
+        try {
+            return userWorkoutSessionDao.getWorkoutSessionByDate(date.defaultFormat())
+                .toWorkoutSessionModel(userExerciseDao, userSetDao, exerciseDetailDao)
+        } catch (e: Exception) {
+            Logs().error("Error getting workout session by date: ${e.message}")
+            return WorkoutSessionModel(date = date)
+        }
     }
 
     override suspend fun getWorkoutSessionByRange(dateRange: CustomDateRange): List<WorkoutSessionModel> {
-        val (startOfDay, endOfDay) = dateRange.getRange()
-        return userWorkoutSessionDao.getWorkoutSessionsByDateRange(
-            startOfDay.defaultFormat(),
-            endOfDay.defaultFormat()
-        ).map { it.toWorkoutSessionModel(userExerciseDao, userSetDao, exerciseDetailDao) }
+        try {
+            val (startOfDay, endOfDay) = dateRange.getRange()
+            return userWorkoutSessionDao.getWorkoutSessionsByDateRange(
+                startOfDay.defaultFormat(),
+                endOfDay.defaultFormat()
+            ).map { it.toWorkoutSessionModel(userExerciseDao, userSetDao, exerciseDetailDao) }
+        } catch (e: Exception) {
+            Logs().error("Error getting workout sessions by date range: ${e.message}")
+            return emptyList()
+        }
     }
 
     override suspend fun getWorkoutSessionId(date: CustomDate): Long {
-        return userWorkoutSessionDao.insertWorkoutSession(
-            UserWorkoutSession(
-                date = date.defaultFormat(),
-                caloriesBurned = 0,
-                duration = 0,
+        try {
+            return userWorkoutSessionDao.insertWorkoutSession(
+                UserWorkoutSession(
+                    date = date.defaultFormat(),
+                    caloriesBurned = 0,
+                    duration = 0,
+                )
             )
-        )
+        } catch (e: Exception) {
+            Logs().error("Error getting workout session ID: ${e.message}")
+            return -1
+        }
     }
 
     override suspend fun saveWorkoutSession(workoutSessionModel: WorkoutSessionModel) {
 
-        Logs().debug("Saving workout session: ${workoutSessionModel.workoutName}")
+        try {
+            Logs().debug("Saving workout session: ${workoutSessionModel.workoutName}, " +
+                    "exercises: ${workoutSessionModel.exercises.joinToString { it.exercise?.name ?: ("null") }}"
+            )
 
-        // Check for exercises
-        if (workoutSessionModel.exercises.any { it.exercise?.id.isNullOrBlank() }) {
-            throw IllegalArgumentException("All exercises must have a valid exercise ID")
-        }
 
-        // Check if exercises is empty
-        if (workoutSessionModel.exercises.isEmpty()) {
-            throw IllegalArgumentException("Workout must have at least one exercise")
-        }
-
-        // Check for sets
-        if (workoutSessionModel.exercises.any { it.sets.isEmpty() }) {
-            throw IllegalArgumentException("All exercises must have at least one set")
-        }
-
-        // Insert workout session
-        val userWorkoutSession = UserWorkoutSession(
-            workoutName = workoutSessionModel.workoutName,
-            date = workoutSessionModel.date.defaultFormat(),
-            caloriesBurned = workoutSessionModel.caloriesBurned,
-            duration = workoutSessionModel.duration,
-        )
-        val workoutId = userWorkoutSessionDao.insertWorkoutSession(userWorkoutSession)
-
-        // Insert exercises
-        userExerciseDao.insertAllUserExerciseDetails(
-            workoutSessionModel.exercises.map { it.toUserExercise(workoutId.toString()) }
-        )
-
-        // Insert sets
-        userSetDao.insertAllUserExerciseSets(
-            workoutSessionModel.exercises.flatMap { exercise ->
-                val exerciseId = userExerciseDao.getUserExerciseDetailsForSession(workoutId.toInt())
-                    .find { it.orderPosition == exercise.orderPosition }?.id.toString()
-                exercise.sets.map { it.toUserSet(exerciseId) }
+            // Check for exercises
+            if (workoutSessionModel.exercises.any { it.exercise?.id.isNullOrBlank() }) {
+                throw IllegalArgumentException("All exercises must have a valid exercise ID")
             }
-        )
 
+            // Check if exercises is empty
+            if (workoutSessionModel.exercises.isEmpty()) {
+                throw IllegalArgumentException("Workout must have at least one exercise")
+            }
+
+            // Check for sets
+            if (workoutSessionModel.exercises.any { it.sets.isEmpty() }) {
+                throw IllegalArgumentException("All exercises must have at least one set")
+            }
+
+            // Insert workout session
+            val userWorkoutSession = UserWorkoutSession(
+                workoutName = workoutSessionModel.workoutName,
+                date = workoutSessionModel.date.defaultFormat(),
+                caloriesBurned = workoutSessionModel.caloriesBurned,
+                duration = workoutSessionModel.duration,
+            )
+            val workoutId = userWorkoutSessionDao.insertWorkoutSession(userWorkoutSession)
+
+
+            // Insert exercises
+            userExerciseDao.insertAllUserExerciseDetails(
+                workoutSessionModel.exercises.map { it.toUserExercise(workoutId.toString()) }
+            )
+
+            // Insert sets
+            userSetDao.insertAllUserExerciseSets(
+                workoutSessionModel.exercises.flatMap { exercise ->
+                    val exerciseId =
+                        userExerciseDao.getUserExerciseDetailsForSession(workoutId.toInt())
+                            .find { it.orderPosition == exercise.orderPosition }?.id.toString()
+                    exercise.sets.map { it.toUserSet(exerciseId) }
+                }
+            )
+
+        } catch (e: Exception) {
+            Logs().error("Error saving workout session: ${e.message}")
+        }
     }
 
-    override suspend fun getWorkoutSessionById(workoutId: String): WorkoutSessionModel {
-        return userWorkoutSessionDao.getWorkoutSession(workoutId.toInt())
-            .toWorkoutSessionModel(userExerciseDao, userSetDao, exerciseDetailDao)
+    override suspend fun getWorkoutSessionById(workoutId: String): WorkoutSessionModel? {
+        try {
+            return userWorkoutSessionDao.getWorkoutSession(workoutId.toInt())
+                .toWorkoutSessionModel(userExerciseDao, userSetDao, exerciseDetailDao)
+        } catch (e: Exception) {
+            Logs().error("Error getting workout session by ID: ${e.message}")
+            return null
+        }
     }
 
     override suspend fun addExerciseToWorkoutSession() {
@@ -119,6 +148,7 @@ class WorkoutSessionRepositoryImpl(
         // Remove set from exercise
     }
     private fun ExerciseSessionModel.toUserExercise(sessionId: String): UserExercise {
+        Logs().debug("Converting exercise session model to user exercise: $this")
         return UserExercise(
             orderPosition = orderPosition,
             exerciseDetailsId = exercise?.id ?: "",
@@ -127,6 +157,7 @@ class WorkoutSessionRepositoryImpl(
     }
 
     private fun SetSessionModel.toUserSet(exerciseId: String): UserSet {
+        Logs().debug("Converting set session model to user set: $this")
         return UserSet(
             orderPosition = orderPosition,
             weight = weight ?: 0f,

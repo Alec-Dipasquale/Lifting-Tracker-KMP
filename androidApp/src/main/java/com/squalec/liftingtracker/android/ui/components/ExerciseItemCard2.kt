@@ -126,7 +126,6 @@ fun ExerciseItemCard2(
                                 orderPosition = exercise.sets.size,
                             ),
                         )
-                        cyclicColorManager.reset()
                     }) {
                     Text(text = "Add Set")
                 }
@@ -145,7 +144,7 @@ fun InputSetRow(
     position: Int = 0,
     isFinished: Boolean = false
 ) {
-    val backgroundColor = cyclicColorManager.nextColor() // Get the next color in the cycle
+    val backgroundColor = cyclicColorManager.nextColorByIndex(set.orderPosition) // Get the next color in the cycle
 
     val weightMetricText = when (weightMetric) {
         WeightMetricTypes.LB -> "lb"
@@ -275,6 +274,13 @@ class CyclicColorManager(baseColor: Color, private val cycleSize: Int = 4) {
         currentIndex = (currentIndex + 1) % colors.size
         return color
     }
+
+    fun nextColorByIndex(index:Int): Color {
+        val color = colors[index%colors.size]
+        return color
+    }
+
+
 
     /**
      * Resets the cycle to start from the beginning.

@@ -175,6 +175,7 @@ fun WorkoutSessionLazyColumn(
                 ExerciseItemCard2(
                     modifier = Modifier.padding(horizontal = 8.dp),
                     exercise = exercise,
+                    isFinished = state.isFinished,
                     onWeightChange = { weight, position,  ->
                         onIntent(
                             WorkoutSessionEvent.ChangeSetWeight(

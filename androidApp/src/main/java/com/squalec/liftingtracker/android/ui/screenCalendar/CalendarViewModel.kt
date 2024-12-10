@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.squalec.liftingtracker.android.ui.navigation.Destination
+import com.squalec.liftingtracker.appdatabase.Logs
 import com.squalec.liftingtracker.appdatabase.repositories.WorkoutSessionModel
 import com.squalec.liftingtracker.appdatabase.repositories.WorkoutSessionRepository
 import com.squalec.liftingtracker.utils.CustomDate
@@ -32,6 +33,7 @@ class CalendarViewModel(private val workoutSessionRepository: WorkoutSessionRepo
         _state.value = CalendarState(loading = true)
         viewModelScope.launch(Dispatchers.IO) {
             val result = workoutSessionRepository.getWorkoutSessionByRange(dateRange = dateRange)
+            Logs().debug("Workout sessions received for date range ${dateRange.getRange().first.utcDate} - ${dateRange.getRange().second.utcDate} with ${result.size} results")
             _state.update {
                 it.copy(workoutSessions = result, loading = false)
             }
@@ -39,18 +41,22 @@ class CalendarViewModel(private val workoutSessionRepository: WorkoutSessionRepo
     }
 
     private fun showWorkoutsDialogue(day: CustomDate, workoutSessions: List<WorkoutSessionModel>) {
+        Logs().debug("Workouts dialogue opened for day $day with ${workoutSessions.size} results")
         _state.update {
             it.copy(calendarWorkoutDialogueState = CalendarWorkoutDialogueState(workoutSessions, day, true))
         }
     }
 
     private fun closeWorkoutsDialogue() {
+        Logs().debug("Workouts dialogue closed")
         _state.update {
             it.copy(calendarWorkoutDialogueState = CalendarWorkoutDialogueState())
         }
     }
 
     private fun workoutSelected(workoutSession: WorkoutSessionModel, nav: NavController) {
+        Logs().debug("Workout selected: ${workoutSession.workoutName}")
+        Logs().debug("Exercises in workout: ${workoutSession.exercises.size}")
         nav.navigate(Destination.WorkoutSession(workoutSessionID = workoutSession.workoutId)) {
             popUpTo(Destination.WorkoutSession()) {
                 inclusive = true
