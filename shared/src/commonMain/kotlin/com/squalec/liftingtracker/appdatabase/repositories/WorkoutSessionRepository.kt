@@ -23,6 +23,7 @@ interface WorkoutSessionRepository {
     suspend fun removeExerciseFromWorkoutSession()
     suspend fun addSetToExercise()
     suspend fun removeSetFromExercise()
+    suspend fun getWorkoutCount(): Int
 }
 
 class WorkoutSessionRepositoryImpl(
@@ -147,6 +148,17 @@ class WorkoutSessionRepositoryImpl(
     override suspend fun removeSetFromExercise() {
         // Remove set from exercise
     }
+
+    override suspend fun getWorkoutCount(): Int {
+        try {
+            return userWorkoutSessionDao.getWorkoutCount()
+        }   catch (e: Exception) {
+            Logs().error("Error getting workout count: ${e.message}")
+            return -1
+        }
+    }
+
+
     private fun ExerciseSessionModel.toUserExercise(sessionId: String): UserExercise {
         Logs().debug("Converting exercise session model to user exercise: $this")
         return UserExercise(

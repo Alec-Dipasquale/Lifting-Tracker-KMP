@@ -22,6 +22,7 @@ object WorkoutSessionManager {
     private val _workoutStartTime = MutableStateFlow<Instant?>(null)
 
     fun startWorkout() {
+
         _workoutState.update {
             it.copy(
                 isWorkoutInProgress = true,

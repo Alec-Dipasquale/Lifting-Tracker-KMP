@@ -43,9 +43,11 @@ import com.squalec.liftingtracker.android.ui.components.BackgroundDefault
 import com.squalec.liftingtracker.android.ui.components.ExerciseItemCard
 import com.squalec.liftingtracker.android.ui.components.ExerciseItemCard2
 import com.squalec.liftingtracker.android.ui.components.StopWorkoutButton
+import com.squalec.liftingtracker.android.ui.components.StopWorkoutButtonV2
 import com.squalec.liftingtracker.android.ui.utilities.clearAllFocusOnTap
 import com.squalec.liftingtracker.android.ui.navigation.Destination
 import com.squalec.liftingtracker.android.ui.themes.WorkoutSessionTheme
+import com.squalec.liftingtracker.android.ui.utilities.LedgerIcons
 import com.squalec.liftingtracker.appdatabase.WorkoutSessionManagedState
 import com.squalec.liftingtracker.appdatabase.WorkoutSessionManager
 import com.squalec.liftingtracker.appdatabase.models.ExerciseDetails
@@ -68,6 +70,17 @@ fun WorkoutSessionScreen(
     val state by viewModel.state.collectAsState()
     val workoutManagerState by WorkoutSessionManager.workoutState.collectAsState()
 
+    // Handle navigation to the home screen
+    if (!state.isWorkoutActive) {
+        navController.navigate(Destination.Home) {
+            popUpTo(Destination.Home) {
+                inclusive = true
+            }
+        }
+        viewModel.onNavigationHandled() // Reset the navigation event
+        return
+    }
+
     LaunchedEffect(key1 = date) {
         if (date != null && !workoutManagerState.isWorkoutInProgress && workoutSessionId == null) {
             viewModel.handleEvent(WorkoutSessionEvent.OnChangeDate(date))
@@ -83,6 +96,12 @@ fun WorkoutSessionScreen(
     LaunchedEffect(key1 = addedExerciseId) {
         if (addedExerciseId != null) {
             viewModel.handleEvent(WorkoutSessionEvent.OnAddExercise(addedExerciseId))
+        }
+    }
+
+    LaunchedEffect(key1 = state.isWorkoutActive) {
+        if (!state.isWorkoutActive) {
+            WorkoutSessionManager.startWorkout()
         }
     }
     BackgroundDefault {
@@ -126,49 +145,40 @@ fun WorkoutSessionLazyColumn(
 ) {
     val focusManager = LocalFocusManager.current
     val workoutWeightMetricType = state.workoutSessionModel?.metricType ?: WeightMetricTypes.LB
-    LazyColumn(modifier = Modifier
-        .clearAllFocusOnTap(focusManager)
-        .fillMaxSize()) {
+    LazyColumn(
+        modifier = Modifier
+            .clearAllFocusOnTap(focusManager)
+            .fillMaxSize()
+    ) {
         // Display workout session
         item {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.primary)
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = "Lifting Ledger".uppercase(),
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Bold
-                        ),
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                    DateTitle(
-                        date = state.date,
-                    )
-                }
-
-                UserTitle(
-                    text = state.workoutSessionModel?.workoutName ?: "Workout",
-                    onIntent,
-                    state.isFinished
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.primary)
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Lifting Ledger".uppercase(),
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold
+                    ),
+                    color = MaterialTheme.colorScheme.onBackground
                 )
-        }
-        state.workoutSessionModel?.exercises?.let { exercises ->
-            item {
-                StopWorkoutButton(
-                    modifier = Modifier
-                        .clearAllFocusOnTap(focusManager)
-                        .fillMaxWidth(),
-                    exercises = exercises,
-                    navController = navController,
-                    onIntent = {
-                        onIntent(it)
-                    },
-                    isHidden = state.isFinished
+                DateTitle(
+                    date = state.date,
                 )
             }
+
+            UserTitle(
+                text = state.workoutSessionModel?.workoutName ?: "Workout",
+                onIntent,
+                state.isFinished
+            )
+        }
+        state.workoutSessionModel?.exercises?.let { exercises ->
+
 
             items(exercises) { exercise ->
 
@@ -176,7 +186,7 @@ fun WorkoutSessionLazyColumn(
                     modifier = Modifier.padding(16.dp),
                     exercise = exercise,
                     isFinished = state.isFinished,
-                    onWeightChange = { weight, position,  ->
+                    onWeightChange = { weight, position ->
                         onIntent(
                             WorkoutSessionEvent.ChangeSetWeight(
                                 weight = weight,
@@ -187,11 +197,11 @@ fun WorkoutSessionLazyColumn(
                     },
                     onRepsChange = { reps, position ->
                         onIntent(
-                        WorkoutSessionEvent.ChangeSetReps(
-                            reps = reps,
-                            exercise = exercise,
-                            position = position
-                        )
+                            WorkoutSessionEvent.ChangeSetReps(
+                                reps = reps,
+                                exercise = exercise,
+                                position = position
+                            )
                         )
                     },
                     onSetAdded = { setSessionModel ->
@@ -209,23 +219,50 @@ fun WorkoutSessionLazyColumn(
                     weightMetric = workoutWeightMetricType
                 )
             }
+
+            if (workoutManagerState.isWorkoutInProgress)
+                item {
+                    AddExerciseButton(
+                        navController = navController
+                    )
+                }
+
+            item {
+                if (workoutManagerState.isWorkoutInProgress) {
+                    val isExercisesEmpty = state.workoutSessionModel.exercises.isEmpty()
+
+                    StopWorkoutButtonV2(
+                        modifier = Modifier
+                            .clearAllFocusOnTap(focusManager)
+                            .fillMaxWidth(),
+                        onClick = {
+                                onIntent(WorkoutSessionEvent.OnFinishedWorkout)
+                        },
+                        icon = LedgerIcons.Custom.LiftingLedgerIcon(),
+                        backgroundColor = MaterialTheme.colorScheme.primary,
+                        textColor = MaterialTheme.colorScheme.onPrimary,
+                        buttonText = if (!isExercisesEmpty) "Finish Workout" else "Cancel Workout"
+                    )
+                }
+            }
+//            item {
+//                if (workoutManagerState.isWorkoutInProgress) {
+//                    Spacer(modifier = Modifier.height(100.dp))
+//                }
+//            }
         }
 
-        if (workoutManagerState.isWorkoutInProgress)
-            item {
-                AddExerciseButton(
-                    navController = navController
-                )
-            }
 
         item {
             Spacer(modifier = Modifier.height(100.dp))
         }
     }
+
+
 }
 
 @Composable
-fun UserTitle(text:String, onIntent: (WorkoutSessionEvent) -> Unit, finished: Boolean) {
+fun UserTitle(text: String, onIntent: (WorkoutSessionEvent) -> Unit, finished: Boolean) {
     var title by remember {
         mutableStateOf(TextFieldValue(text.uppercase()))
     }
@@ -243,15 +280,17 @@ fun UserTitle(text:String, onIntent: (WorkoutSessionEvent) -> Unit, finished: Bo
                 color = MaterialTheme.colorScheme.onBackground
             )
         } else {
-            Column(modifier = Modifier
-                .fillMaxWidth()
-                .clip(shape = RoundedCornerShape(8.dp))
-                .background(MaterialTheme.colorScheme.surface)
-            ) {
-                Box(modifier = Modifier
+            Column(
+                modifier = Modifier
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.secondary)
-                    .padding(16.dp)
+                    .clip(shape = RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colorScheme.surface)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.secondary)
+                        .padding(16.dp)
                 ) {
                     Text(
                         text = "Workout Title:".uppercase(),

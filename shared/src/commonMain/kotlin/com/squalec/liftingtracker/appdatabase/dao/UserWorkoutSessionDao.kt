@@ -18,4 +18,6 @@ interface UserWorkoutSessionDao {
     suspend fun getWorkoutSessionByDate(utcDate: String): UserWorkoutSession
     @Query("SELECT * FROM user_workout_sessions WHERE date BETWEEN :startOfDay AND :endOfDay")
     suspend fun getWorkoutSessionsByDateRange(startOfDay: String, endOfDay: String): List<UserWorkoutSession>
+    @Query("SELECT COUNT(*) FROM user_workout_sessions")
+    suspend fun getWorkoutCount(): Int
 }

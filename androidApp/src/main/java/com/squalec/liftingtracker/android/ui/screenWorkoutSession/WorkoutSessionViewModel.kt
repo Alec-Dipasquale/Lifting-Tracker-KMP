@@ -156,11 +156,24 @@ class WorkoutSessionViewModel(
 
     }
 
+    fun onNavigationHandled() {
+        _state.value = _state.value.copy(isWorkoutActive = true)
+    }
+
     private fun finishWorkout() {
         Logs().debug("Finishing workout")
         WorkoutSessionManager.stopWorkout()
         var workoutSession = _state.value.workoutSessionModel
         workoutSession = workoutSession?.copy(duration = WorkoutSessionManager.getWorkoutDuration())
+        if(workoutSession?.exercises.isNullOrEmpty()){
+            Logs().debug("Exercise Canceled")
+            _state.update {
+                it.copy(
+                    isWorkoutActive = false
+                )
+            }
+            return
+        }
 
         viewModelScope.launch(Dispatchers.IO) {
             workoutSessionRepository.saveWorkoutSession(
@@ -251,14 +264,19 @@ class WorkoutSessionViewModel(
 
     private fun changeDate(date: CustomDate) {
         Logs().debug("Changing date to ${date.utcDate}")
-        _state.update { currentState ->
-            currentState.copy(
-                date = date,
-                workoutSessionModel = WorkoutSessionModel(
+
+        viewModelScope.launch(Dispatchers.IO) {
+            val workoutNumber = workoutSessionRepository.getWorkoutCount()
+            _state.update { currentState ->
+                currentState.copy(
                     date = date,
-                    exercises = emptyList()
+                    workoutSessionModel = WorkoutSessionModel(
+                        date = date,
+                        exercises = emptyList(),
+                        workoutName = "Workout ${workoutNumber + 1} - ${date.displayFormat()}"
+                    )
                 )
-            )
+            }
         }
         onUpdateWorkoutCache()
     }
@@ -331,7 +349,9 @@ data class WorkoutSessionState(
     val workoutSessionModel: WorkoutSessionModel? = null,
     val isFinished: Boolean = false,
     val isLoading : Boolean = false,
-    val error: String = ""
+    val error: String = "",
+    val isWorkoutActive: Boolean = true,
+    val navigateToHome: Boolean = false
 )
 
 sealed class WorkoutSessionEvent {

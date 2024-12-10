@@ -33,6 +33,10 @@ import com.squalec.liftingtracker.utils.CustomDate
 
 @Composable
 fun HomeScreen(navController: NavController) {
+
+    /*
+    *   todo UI design for center button
+    * */
     BackgroundDefault {
         Column(
             modifier = Modifier

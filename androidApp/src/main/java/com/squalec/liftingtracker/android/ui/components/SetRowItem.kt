@@ -105,6 +105,9 @@ fun EditableSetTextField(
     set: SetSessionModel? = null, // Assuming this is your Set data class or type
     position: Int? = null
 ) {
+
+//    todo get rid of the auto highlight after first number typed which deletes upon second number typed
+
     var textFieldValue by remember { mutableStateOf(TextFieldValue(text)) }
     var isFirstFocus by remember { mutableStateOf(false) }
 

@@ -53,6 +53,10 @@ fun ExerciseItemCard2(
     weightMetric: WeightMetricTypes = WeightMetricTypes.LB,
     isFinished: Boolean = false
 ) {
+    /*
+    *   todo Add exercise deletion on long press
+    *   todo Add Set deletion on long press
+    *   */
     Column(
         modifier = modifier
             .fillMaxWidth()
