@@ -116,7 +116,8 @@ fun EditableSetTextField(
             modifier = Modifier
                 .width(50.dp)
                 .clip(shape = RoundedCornerShape(4.dp)),
-            style = MaterialTheme.typography.bodyMedium // Adjust style as needed
+            style = MaterialTheme.typography.bodyMedium, // Adjust style as needed,
+            color = MaterialTheme.colorScheme.onSurface
         )
     } else {
         BasicTextField(
@@ -153,7 +154,8 @@ fun EditableSetTextField(
                         )
                         onIntent(orderPosition, textFieldValue.text)
                     }
-                }
+                },
+            singleLine = true
         )
     }
 }

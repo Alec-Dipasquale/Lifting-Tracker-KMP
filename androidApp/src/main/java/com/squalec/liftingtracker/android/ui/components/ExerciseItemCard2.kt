@@ -1,6 +1,7 @@
 package com.squalec.liftingtracker.android.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
@@ -51,31 +53,23 @@ fun ExerciseItemCard2(
     weightMetric: WeightMetricTypes = WeightMetricTypes.LB,
     isFinished: Boolean = false
 ) {
-
-
-    val cyclicColorManager = remember {
-        CyclicColorManager(
-            cycleSize = 4, baseColor = Color(
-                0xFFCFD3E0
-            )
-        )
-    }
-
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(16.dp)) // Clip ensures content respects rounded corners
+            .background(MaterialTheme.colorScheme.surface) // Rounded corners for the card
+            .border(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f), RoundedCornerShape(16.dp))
     ) {
+        // Top header
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(
                     MaterialTheme.colorScheme.secondary,
-                    RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp)
+                    RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
                 )
-                .padding(8.dp),
+                .padding(8.dp)
         ) {
-
             Icon(
                 imageVector = LedgerIcons.Custom.LiftingLedgerIcon(),
                 contentDescription = "label Icon",
@@ -86,52 +80,52 @@ fun ExerciseItemCard2(
             Text(
                 text = exercise.exercise?.name ?: "Exercise",
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSecondary,
+                color = MaterialTheme.colorScheme.onSecondary
             )
         }
 
+        // Exercise sets
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surface) // Matches card surface color
         ) {
-            exercise.sets.let { sets ->
-
-                sets.forEachIndexed { index, it ->
-
-                    InputSetRow(
-                        set = it,
-                        onWeightChange = { weightChange ->
-                            onWeightChange(weightChange.toFloat(), index)
-                        },
-                        onRepsChange = { reps ->
-                            onRepsChange(reps, index)
-                        },
-                        weightMetric = weightMetric,
-                        isFinished = isFinished,
-                        cyclicColorManager = cyclicColorManager,
-                        position = index
-                    )
-                }
+            exercise.sets.forEachIndexed { index, set ->
+                InputSetRow(
+                    set = set,
+                    onWeightChange = { weightChange ->
+                        onWeightChange(weightChange.toFloat(), index)
+                    },
+                    onRepsChange = { reps ->
+                        onRepsChange(reps, index)
+                    },
+                    weightMetric = weightMetric,
+                    isFinished = isFinished,
+                    cyclicColorManager = CyclicColorManager(Color(0xFFCFD3E0), 4),
+                    position = index
+                )
             }
 
-            if (!isFinished)
+            if (!isFinished) {
                 Button(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(4.dp),
-                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp),
                     onClick = {
                         onSetAdded(
                             SetSessionModel(
                                 orderPosition = exercise.sets.size,
-                            ),
+                            )
                         )
-                    }) {
+                    }
+                ) {
                     Text(text = "Add Set")
                 }
+            }
         }
     }
 }
+
 
 @Composable
 fun InputSetRow(

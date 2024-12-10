@@ -173,7 +173,7 @@ fun WorkoutSessionLazyColumn(
             items(exercises) { exercise ->
 
                 ExerciseItemCard2(
-                    modifier = Modifier.padding(horizontal = 8.dp),
+                    modifier = Modifier.padding(16.dp),
                     exercise = exercise,
                     isFinished = state.isFinished,
                     onWeightChange = { weight, position,  ->
