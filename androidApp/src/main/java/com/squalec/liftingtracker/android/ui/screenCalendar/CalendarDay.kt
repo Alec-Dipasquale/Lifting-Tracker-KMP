@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.DayPosition
 import com.squalec.liftingtracker.android.ui.themes.CalendarViewTheme
+import com.squalec.liftingtracker.android.ui.utilities.LedgerIcons
 import com.squalec.liftingtracker.appdatabase.repositories.WorkoutSessionModel
 import com.squalec.liftingtracker.utils.CustomDate
 import java.time.LocalDate
@@ -87,7 +88,7 @@ fun Day(
 fun WorkoutSessionView(session: WorkoutSessionModel) {
     Row {
         Icon(
-            Icons.Default.Done,
+            LedgerIcons.Custom.LiftingLedgerIcon(),
             contentDescription = "",
             tint = Color.Green,
             modifier = Modifier
@@ -99,6 +100,7 @@ fun WorkoutSessionView(session: WorkoutSessionModel) {
             text = session.workoutName,
             fontSize = 8.sp,
             maxLines = 1,
+            color = MaterialTheme.colorScheme.onSurface,
             overflow = TextOverflow.Ellipsis  // Use ellipsis for longer text
         )
     }

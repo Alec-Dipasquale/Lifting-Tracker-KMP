@@ -2,6 +2,7 @@ package com.squalec.liftingtracker.android.ui.screenWorkoutSession
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.squalec.liftingtracker.appdatabase.Logs
 import com.squalec.liftingtracker.appdatabase.WorkoutSessionManager
 import com.squalec.liftingtracker.appdatabase.repositories.ExerciseDetailsRepository
 import com.squalec.liftingtracker.appdatabase.repositories.ExerciseSessionModel
@@ -25,7 +26,7 @@ class WorkoutSessionViewModel(
     val state: StateFlow<WorkoutSessionState> = _state
 
     init {
-        Timber.d("WorkoutSessionViewModel initialized")
+        Logs().debug("Workout Session ViewModel initialized")
         val workoutState = WorkoutSessionManager.workoutState.value
         if (workoutState.isWorkoutInProgress) {
             _state.update {
@@ -96,6 +97,7 @@ class WorkoutSessionViewModel(
 //    }
 
     private fun onChangeSetReps(exercise: ExerciseSessionModel, position: Int, reps: Int) {
+        Logs().debug("Changing reps for exercise: ${exercise.exercise?.name}")
         val updatedExercise = exercise.copy(
             sets = exercise.sets.map {
                 if (it.orderPosition == position) {
@@ -125,6 +127,7 @@ class WorkoutSessionViewModel(
     }
 
     private fun onChangeSetWeight(exercise: ExerciseSessionModel, position: Int, weight: Float) {
+        Logs().debug("Changing weight to $weight for exercise: ${exercise.exercise?.name}")
         val updatedExercise = exercise.copy(
             sets = exercise.sets.map {
                 if (it.orderPosition == position) {
@@ -153,10 +156,24 @@ class WorkoutSessionViewModel(
 
     }
 
+    fun onNavigationHandled() {
+        _state.value = _state.value.copy(isWorkoutActive = true)
+    }
+
     private fun finishWorkout() {
+        Logs().debug("Finishing workout")
         WorkoutSessionManager.stopWorkout()
         var workoutSession = _state.value.workoutSessionModel
         workoutSession = workoutSession?.copy(duration = WorkoutSessionManager.getWorkoutDuration())
+        if(workoutSession?.exercises.isNullOrEmpty()){
+            Logs().debug("Exercise Canceled")
+            _state.update {
+                it.copy(
+                    isWorkoutActive = false
+                )
+            }
+            return
+        }
 
         viewModelScope.launch(Dispatchers.IO) {
             workoutSessionRepository.saveWorkoutSession(
@@ -172,6 +189,7 @@ class WorkoutSessionViewModel(
     }
 
     private fun onAddSet(set: SetSessionModel, exerciseId: String) {
+        Logs().debug("Adding set to exercise: $exerciseId")
         val workoutSession = _state.value.workoutSessionModel ?: return
         val exercise = workoutSession.exercises.find { it.exercise?.id == exerciseId } ?: return
         val lastSet = exercise.sets.lastOrNull() ?: return
@@ -197,23 +215,25 @@ class WorkoutSessionViewModel(
     }
 
     private fun onAddExercise(exerciseId: String) {
-        Timber.d("Adding exercise: $exerciseId")
-        Timber.d("Workout session 1: ${_state.value.workoutSessionModel}")
-        Timber.d("Workout Session date: ${_state.value.date?.displayFormat()}")
+        Logs().debug("Adding exercise: $exerciseId")
+        Logs().debug("Workout Session date: ${_state.value.date?.displayFormat()}")
         val isDuplicate =
             _state.value.workoutSessionModel?.exercises?.any { it.exercise?.id == exerciseId }
                 ?: false
         if (isDuplicate) {
-            Timber.d("Exercise already added")
+            Logs().debug("Exercise already added")
             return
         }
 
         viewModelScope.launch(Dispatchers.IO) {
             val exerciseDetail = exerciseDetailsRepository.getExerciseDetails(exerciseId)
-            Timber.d("Fetched exercise details: $exerciseDetail")
+            Logs().debug("Fetched exercise details for ${exerciseDetail?.name}")
 
             // Additional log before updating the state
-            Timber.d("State before update: ${_state.value}")
+            Logs().debug(
+                "State before update: exercise_id ${_state.value.workoutSessionModel?.workoutId}, " +
+                        "exercises: ${_state.value.workoutSessionModel?.exercises?.joinToString { it.exercise?.name ?: "Unknown" }}"
+            )
 
             _state.update {
                 it.copy(
@@ -232,25 +252,32 @@ class WorkoutSessionViewModel(
             WorkoutSessionManager.updateModel(_state.value.workoutSessionModel ?: return@launch)
 
             // Logs after state update
-            Timber.d("Added exercise: $exerciseDetail")
-            Timber.d("Workout session 2: ${_state.value.workoutSessionModel}")
+            Logs().debug("Added exercise: ${exerciseDetail?.name}")
+            Logs().debug(
+                "State after update: exercise_id ${_state.value.workoutSessionModel?.workoutId}, " +
+                        "exercises: ${_state.value.workoutSessionModel?.exercises?.joinToString { it.exercise?.name ?: "Unknown" }}"
+            )
 
         }
         onUpdateWorkoutCache()
     }
 
     private fun changeDate(date: CustomDate) {
-        Timber.d("Changing date to ${date.utcDate}")
-        _state.update { currentState ->
-            currentState.copy(
-                date = date,
-                workoutSessionModel = WorkoutSessionModel(
+        Logs().debug("Changing date to ${date.utcDate}")
+
+        viewModelScope.launch(Dispatchers.IO) {
+            val workoutNumber = workoutSessionRepository.getWorkoutCount()
+            _state.update { currentState ->
+                currentState.copy(
                     date = date,
-                    exercises = emptyList()
+                    workoutSessionModel = WorkoutSessionModel(
+                        date = date,
+                        exercises = emptyList(),
+                        workoutName = "Workout ${workoutNumber + 1} - ${date.displayFormat()}"
+                    )
                 )
-            )
+            }
         }
-        Timber.d("Workout session 3: ${_state.value.workoutSessionModel}")
         onUpdateWorkoutCache()
     }
 
@@ -266,10 +293,12 @@ class WorkoutSessionViewModel(
     }
 
     private fun onUpdateWorkoutCache() {
+        Logs().debug("Updating Workout Session Manager cache")
         WorkoutSessionManager.updateModel(_state.value.workoutSessionModel ?: return)
     }
 
     private fun changeWorkoutTitle(text: String) {
+        Logs().debug("Changing workout title to $text from ${_state.value.workoutSessionModel?.workoutName}")
         _state.update {
             it.copy(
                 workoutSessionModel = it.workoutSessionModel?.copy(
@@ -281,11 +310,22 @@ class WorkoutSessionViewModel(
     }
 
     private fun onLoadWorkoutSession(workoutId: String) {
+        Logs().debug("Loading workout session with ID: $workoutId")
         _state.update {
             it.copy(isLoading = true)
         }
         viewModelScope.launch(Dispatchers.IO) {
             val workoutSession = workoutSessionRepository.getWorkoutSessionById(workoutId)
+            if(workoutSession == null) {
+                Timber.e("Workout session not found")
+                _state.update {
+                    it.copy(
+                        error = "Workout session not found",
+                        isLoading = false
+                    )
+                }
+                return@launch
+            }
             _state.update {
                 it.copy(
                     workoutSessionModel = WorkoutSessionModel(
@@ -295,7 +335,7 @@ class WorkoutSessionViewModel(
                         date = workoutSession.date
 
                     ),
-                    date = workoutSession?.date,
+                    date = workoutSession.date,
                     isFinished = true,
                     isLoading = false
                 )
@@ -308,7 +348,10 @@ data class WorkoutSessionState(
     val date: CustomDate? = null,
     val workoutSessionModel: WorkoutSessionModel? = null,
     val isFinished: Boolean = false,
-    val isLoading : Boolean = false
+    val isLoading : Boolean = false,
+    val error: String = "",
+    val isWorkoutActive: Boolean = true,
+    val navigateToHome: Boolean = false
 )
 
 sealed class WorkoutSessionEvent {

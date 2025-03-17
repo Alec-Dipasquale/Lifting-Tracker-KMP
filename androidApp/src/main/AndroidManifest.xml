@@ -6,8 +6,9 @@
         android:name=".MainApplication"
         android:allowBackup="false"
         android:supportsRtl="true"
-
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:label="Lifting Ledger"
+        android:roundIcon="@drawable/lifting_ledger_icon">
         <activity
             android:name=".MainActivity"
             android:exported="true">

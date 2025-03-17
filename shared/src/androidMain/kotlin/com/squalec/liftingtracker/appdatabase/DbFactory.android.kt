@@ -3,12 +3,14 @@ package com.squalec.liftingtracker.appdatabase
 import android.content.Context
 import android.util.Log
 import androidx.room.Room
+import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import kotlinx.coroutines.Dispatchers
 import org.koin.core.component.KoinComponent
 import org.koin.java.KoinJavaComponent.getKoin
+import java.util.concurrent.Executors
 
 
 actual object DBFactory : KoinComponent {
@@ -20,10 +22,21 @@ actual object DBFactory : KoinComponent {
         val context: Context = getKoin().get()
         return INSTANCE ?: synchronized(this) {
             val instance = Room.databaseBuilder(
-                context.applicationContext,
-                AppDatabase::class.java,
-                dbFileName,
-            ).addMigrations(MIGRATION_1_2)
+                        context.applicationContext,
+                        AppDatabase::class.java,
+                        dbFileName,
+                    )
+                .addCallback(object : RoomDatabase.Callback() {
+                    override fun onOpen(db: SupportSQLiteDatabase) {
+                        super.onOpen(db)
+                        db.execSQL("PRAGMA foreign_keys = ON;") // Enable foreign key constraints
+                    }
+                })
+                .fallbackToDestructiveMigration(false)
+
+//                .setQueryCallback({ sqlQuery, bindArgs ->
+//                    Logs().debug("[SQL Query] Query: $sqlQuery Args: $bindArgs")
+//                }, Runnable::run) // Runs on the current thread
                 .build()
             INSTANCE = instance
             instance
@@ -34,11 +47,19 @@ actual object DBFactory : KoinComponent {
         val context: Context = getKoin().get()
         val jsonString = uploadJsonToDatabase(context, "exercises.json")
         val exercises = parseExercises(jsonString)
+
         Logs().log("Adding exercises to database")
+
         val db = createDatabase()
-        db.exerciseDao().insertExercises(*exercises.toTypedArray())
-        Logs().log("Exercises added to database")
+        val insertResults = db.exerciseDao().insertExercises(*exercises.toTypedArray())
+
+        if (insertResults.all { it == -1L }) {
+            Logs().log("All exercises already exist in the database; no new rows added.")
+        } else {
+            Logs().log("${insertResults.count { it != -1L }} new exercises added to the database.")
+        }
     }
+
 
     private fun uploadJsonToDatabase(context: Context, fileName: String): String {
         return context.assets.open(fileName).bufferedReader().use { it.readText() }

@@ -7,8 +7,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -26,6 +28,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.squalec.liftingtracker.android.ui.screenCalendar.CalendarIntent
 import com.squalec.liftingtracker.android.ui.screenCalendar.CalendarWorkoutDialogueState
+import com.squalec.liftingtracker.android.ui.themes.CalendarViewTheme
 import com.squalec.liftingtracker.appdatabase.models.ExerciseDetails
 import com.squalec.liftingtracker.appdatabase.repositories.ExerciseSessionModel
 import com.squalec.liftingtracker.appdatabase.repositories.WorkoutSessionModel
@@ -50,7 +53,7 @@ fun CalendarWorkoutsDialogue(
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.background)
                     .padding(16.dp)
 
@@ -58,7 +61,8 @@ fun CalendarWorkoutsDialogue(
                 Text(
                     text = "Workouts for ${day.formattedToDay()}",
                     style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier.padding(16.dp),
+                    color = MaterialTheme.colorScheme.surface
                 )
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth(),
@@ -73,6 +77,7 @@ fun CalendarWorkoutsDialogue(
                                     MaterialTheme.shapes.small
                                 )
                                 .clip(MaterialTheme.shapes.medium)
+                                .background(MaterialTheme.colorScheme.surface)
                                 .clickable {
                                     onIntent(
                                         CalendarIntent.OnWorkoutSelected(
@@ -115,6 +120,8 @@ fun CalendarWorkoutsDialogue(
                                 }
                             }
                         }
+
+                        Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
             }
@@ -126,45 +133,47 @@ fun CalendarWorkoutsDialogue(
 @Preview
 @Composable
 fun PreviewCalendarWorkoutsDialogue() {
-    CalendarWorkoutsDialogue(
-        navController = rememberNavController(),
-        state = CalendarWorkoutDialogueState(
-            day = CustomDate("2022-01-01T00:00:00"),
-            workoutSessions = listOf(
-                WorkoutSessionModel(
-                    workoutName = "Workout 1",
-                    exercises = listOf(
-                        ExerciseSessionModel(
-                            ExerciseDetails(
-                                id = "",
-                                category = "Chest",
-                                name = "Bench Press",
-                                level = "3"
-                            ),
-                            orderPosition = 1,
-                            sets = listOf(),
-                        )
+    CalendarViewTheme {
+        CalendarWorkoutsDialogue(
+            navController = rememberNavController(),
+            state = CalendarWorkoutDialogueState(
+                day = CustomDate("2022-01-01T00:00:00"),
+                workoutSessions = listOf(
+                    WorkoutSessionModel(
+                        workoutName = "Workout 1",
+                        exercises = listOf(
+                            ExerciseSessionModel(
+                                ExerciseDetails(
+                                    id = "",
+                                    category = "Chest",
+                                    name = "Bench Press",
+                                    level = "3"
+                                ),
+                                orderPosition = 1,
+                                sets = listOf(),
+                            )
+                        ),
+                        date = CustomDate.now()
                     ),
-                    date = CustomDate.now()
+                    WorkoutSessionModel(
+                        workoutName = "Workout 2",
+                        exercises = listOf(
+                            ExerciseSessionModel(
+                                ExerciseDetails(
+                                    id = "",
+                                    category = "Chest",
+                                    name = "Chest Flies",
+                                    level = "3"
+                                ),
+                                orderPosition = 1,
+                                sets = listOf(),
+                            )
+                        ),
+                        date = CustomDate.now()
+                    )
                 ),
-                WorkoutSessionModel(
-                    workoutName = "Workout 2",
-                    exercises = listOf(
-                        ExerciseSessionModel(
-                            ExerciseDetails(
-                                id = "",
-                                category = "Chest",
-                                name = "Chest Flies",
-                                level = "3"
-                            ),
-                            orderPosition = 1,
-                            sets = listOf(),
-                        )
-                    ),
-                    date = CustomDate.now()
-                )
-            ),
-            isWorkoutsDialogueOpen = true
+                isWorkoutsDialogueOpen = true
+            )
         )
-    )
+    }
 }

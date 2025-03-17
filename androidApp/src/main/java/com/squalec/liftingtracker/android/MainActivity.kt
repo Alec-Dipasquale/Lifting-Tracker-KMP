@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import com.squalec.liftingtracker.android.ui.navigation.NavGraph
 import com.squalec.liftingtracker.android.ui.themes.MyApplicationTheme
 import com.squalec.liftingtracker.appdatabase.DBFactory
+import com.squalec.liftingtracker.appdatabase.Logs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -31,7 +32,7 @@ class MainActivity : ComponentActivity() {
             CoroutineScope(context = Dispatchers.IO).launch {
                 dbFactory.populateExerciseDetailsDatabase()
                 isLoading = false
-                Timber.d("[Database123] Database populated")
+                Logs().debug("[Database123] Database populated")
             }
             MyApplicationTheme {
                 Surface(

@@ -18,12 +18,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.kizitonwose.calendar.compose.ContentHeightMode
 import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
+import com.squalec.liftingtracker.android.ui.components.BackgroundDefault
 import com.squalec.liftingtracker.android.ui.components.CalendarWorkoutsDialogue
 import com.squalec.liftingtracker.android.ui.themes.CalendarViewTheme
+import com.squalec.liftingtracker.appdatabase.Logs
 import com.squalec.liftingtracker.appdatabase.models.ExerciseDetails
 import com.squalec.liftingtracker.appdatabase.repositories.ExerciseSessionModel
 import com.squalec.liftingtracker.appdatabase.repositories.WorkoutSessionModel
@@ -43,7 +46,7 @@ fun CalendarView(
     val startMonth = remember { currentMonth.minusMonths(24) } // Adjust as needed
     val endMonth = remember { currentMonth.plusMonths(24) } // Adjust as needed
     val firstDayOfWeek = remember { firstDayOfWeekFromLocale() } // Available from the library
-    Timber.d("Current month: $currentMonth and currentmonth: ${currentMonth.month.value}")
+    Logs().debug("Current month: $currentMonth and currentmonth: ${currentMonth.month.value}")
 
     val state by viewModel.state.collectAsState()
 
@@ -64,6 +67,7 @@ fun CalendarView(
         firstVisibleMonth = currentMonth,
         firstDayOfWeek = firstDayOfWeek
     )
+
 
     CalendarViewContent(
         calendarState,
@@ -93,36 +97,41 @@ fun CalendarView(
 
 @Composable
 fun CalendarViewContent(
-    calendarState: com.kizitonwose.calendar.compose.CalendarState, state: CalendarState,
+    calendarState: com.kizitonwose.calendar.compose.CalendarState,
+    state: CalendarState,
     onIntent: (CalendarDay, List<WorkoutSessionModel>) -> Unit = { _, _ -> }
 ) {
-    HorizontalCalendar(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(16.dp),
-        monthHeader = { month ->
+    BackgroundDefault {
+        HorizontalCalendar(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            contentHeightMode = ContentHeightMode.Fill,
+            monthHeader = { month ->
 
-            val daysOfWeek = month.weekDays.first().map { it.date.dayOfWeek }
-            MonthHeader(daysOfWeek = daysOfWeek, month = month.yearMonth)
-        },
+                val daysOfWeek = month.weekDays.first().map { it.date.dayOfWeek }
+                MonthHeader(daysOfWeek = daysOfWeek, month = month.yearMonth)
+            },
 
-        state = calendarState,
-        dayContent = { day ->
-            val workoutSessions = state.workoutSessions.filter { workoutSessionModel ->
+            state = calendarState,
+            dayContent = { day ->
+                val workoutSessions = state.workoutSessions.filter { workoutSessionModel ->
 
-                workoutSessionModel.date.formattedToDay() == day.formatToCustomDate()
-                    .formattedToDay()
-            }
-            Day(
-                day = day,
-                workoutSessions = workoutSessions,
-                onClick = {
-                    onIntent(day, workoutSessions)
+                    workoutSessionModel.date.formattedToDay() == day.formatToCustomDate()
+                        .formattedToDay()
                 }
-            )
-        }
-    )
+                if (day.date.month == calendarState.firstVisibleMonth.yearMonth.month) {
+                    Day(
+                        day = day,
+                        workoutSessions = workoutSessions,
+                        onClick = {
+                            onIntent(day, workoutSessions)
+                        }
+                    )
+                }
+            }
+        )
+    }
 }
 
 @Composable
@@ -130,12 +139,12 @@ fun MonthHeader(daysOfWeek: List<DayOfWeek>, month: YearMonth) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.background),
     ) {
         Text(
             text = month.month.name,
             style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(16.dp),
+            color = MaterialTheme.colorScheme.onPrimary
         )
         Row(
             horizontalArrangement = Arrangement.SpaceEvenly,
@@ -145,6 +154,7 @@ fun MonthHeader(daysOfWeek: List<DayOfWeek>, month: YearMonth) {
                 Text(
                     text = it.name.take(3),
                     style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.padding(10.dp)
                 )
             }

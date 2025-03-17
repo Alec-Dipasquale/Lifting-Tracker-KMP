@@ -24,57 +24,70 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.squalec.liftingtracker.android.ui.components.BackgroundDefault
 import com.squalec.liftingtracker.android.ui.navigation.Destination
 import com.squalec.liftingtracker.android.ui.navigation.TabDestinations
-import com.squalec.liftingtracker.android.ui.utilities.Icons
+import com.squalec.liftingtracker.android.ui.utilities.LedgerIcons
 import com.squalec.liftingtracker.appdatabase.WorkoutSessionManager
 import com.squalec.liftingtracker.utils.CustomDate
 
 @Composable
 fun HomeScreen(navController: NavController) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
 
+    /*
+    *   todo UI design for center button
+    * */
+    BackgroundDefault {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-        Box(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-            IconButton(
-
-                onClick = {
-                    navController.navigate(Destination.CalendarView)
-                }) {
-                Icon(
-                    modifier = Modifier.size(48.dp),
-                    imageVector = Icons.Custom.MyHistory(),
-                    contentDescription = ""
-                )
-            }
             Box(
                 modifier = Modifier
-                    .size(150.dp)
-                    .clip(CircleShape)
-                    .clickable {
-                        val date = if (WorkoutSessionManager.workoutState.value.isWorkoutInProgress)
-                            null else CustomDate.now().utcDate
-                        navController.navigate(Destination.WorkoutSession(date = date))
-                    }
-                    .background(MaterialTheme.colorScheme.primary)
+                    .fillMaxSize()
                     .padding(16.dp)
-                    .border(4.dp, MaterialTheme.colorScheme.secondary, CircleShape)
-                    .padding(4.dp)
-                    .align(Alignment.Center)
-                ,
-                contentAlignment = Alignment.Center) {
-                Text(
-                    text = "Start\n Workout",
-                    style = TextStyle(
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        textAlign = TextAlign.Center
-                    ),
-                    textAlign = TextAlign.Center,
-                )
+            ) {
+                IconButton(
+
+                    onClick = {
+                        navController.navigate(Destination.CalendarView)
+                    }) {
+                    Icon(
+                        modifier = Modifier.size(48.dp),
+                        imageVector = LedgerIcons.Custom.MyHistory(),
+                        contentDescription = ""
+                    )
+                }
+
+
+
+                Box(
+                    modifier = Modifier
+                        .size(150.dp)
+                        .clip(CircleShape)
+                        .clickable {
+                            val date =
+                                if (WorkoutSessionManager.workoutState.value.isWorkoutInProgress)
+                                    null else CustomDate.now().utcDate
+                            navController.navigate(Destination.WorkoutSession(date = date))
+                        }
+                        .background(MaterialTheme.colorScheme.primary)
+                        .padding(16.dp)
+                        .border(4.dp, MaterialTheme.colorScheme.secondary, CircleShape)
+                        .padding(4.dp)
+                        .align(Alignment.Center),
+                    contentAlignment = Alignment.Center) {
+                    Text(
+                        text = "Start\n Workout",
+                        style = TextStyle(
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            textAlign = TextAlign.Center
+                        ),
+                        textAlign = TextAlign.Center,
+                    )
+                }
             }
         }
     }

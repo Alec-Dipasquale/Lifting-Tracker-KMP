@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.wear.compose.material.Text
+import com.squalec.liftingtracker.android.ui.components.BackgroundDefault
 import com.squalec.liftingtracker.android.ui.components.ExerciseDetailCard
 import com.squalec.liftingtracker.android.ui.components.ExerciseDetailListCard
 import com.squalec.liftingtracker.android.ui.components.ImageCarousel
@@ -41,77 +42,80 @@ fun ExerciseDetailScreen(
         viewModel.intent(ExerciseDetailsIntent.GetExercise(exerciseId))
     }
 
-    LazyColumn(
-        modifier = Modifier
-            .scrollable(orientation = Orientation.Vertical, state = rememberScrollState())
-            .fillMaxSize()
-            .padding(16.dp)
-            .background(MaterialTheme.colorScheme.background)
-    ) {
-        item {
-            Column {
-                Text(
-                    text = state.exerciseDetails?.name ?: "No Name",
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
-                Divider(color = MaterialTheme.colorScheme.onBackground, thickness = 1.dp)
-                Spacer(modifier = Modifier.height(16.dp))
-                ImageCarousel(state.exerciseImageIds)
-                Spacer(modifier = Modifier.height(16.dp))
+    BackgroundDefault {
+        LazyColumn(
+            modifier = Modifier
+                .scrollable(orientation = Orientation.Vertical, state = rememberScrollState())
+                .fillMaxSize()
+                .padding(16.dp)
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            item {
+                Column {
+                    Text(
+                        text = state.exerciseDetails?.name ?: "No Name",
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+                    Divider(color = MaterialTheme.colorScheme.onBackground, thickness = 1.dp)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    ImageCarousel(state.exerciseImageIds)
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
             }
-        }
-        item {
-            ExerciseDetailListCard(
-                title = "Primary Muscle",
-                content = state.exerciseDetails?.primaryMuscles
-                    ?: listOf("No Primary Muscle Listed")
-            )
-        }
-        item {
-            ExerciseDetailListCard(
-                title = "Secondary Muscle",
-                content = state.exerciseDetails?.secondaryMuscles
-                    ?: listOf("No Secondary Muscle Listed")
-            )
-        }
-        item {
-            ExerciseDetailCard(
-                title = "Equipment",
-                content = state.exerciseDetails?.equipment ?: "No Equipment Listed"
-            )
-        }
-        item {
-            ExerciseDetailCard(
-                title = "Mechanics",
-                content = state.exerciseDetails?.mechanic ?: "No Mechanics Listed"
-            )
-        }
-        item {
-            ExerciseDetailCard(
-                title = "Level",
-                content = state.exerciseDetails?.level ?: "No Level Listed"
-            )
-        }
-        item {
-            ExerciseDetailCard(
-                title = "Force",
-                content = state.exerciseDetails?.force ?: "No Force Listed"
-            )
-        }
-        item {
-            ExerciseDetailCard(
-                title = "Category",
-                content = state.exerciseDetails?.category ?: "No Category Listed"
-            )
-        }
-        item {
-            ExerciseDetailListCard(
-                title = "Instructions",
-                content = state.exerciseDetails?.instructions ?: listOf("No Instructions Listed")
-            )
+            item {
+                ExerciseDetailListCard(
+                    title = "Primary Muscle",
+                    content = state.exerciseDetails?.primaryMuscles
+                        ?: listOf("No Primary Muscle Listed")
+                )
+            }
+            item {
+                ExerciseDetailListCard(
+                    title = "Secondary Muscle",
+                    content = state.exerciseDetails?.secondaryMuscles
+                        ?: listOf("No Secondary Muscle Listed")
+                )
+            }
+            item {
+                ExerciseDetailCard(
+                    title = "Equipment",
+                    content = state.exerciseDetails?.equipment ?: "No Equipment Listed"
+                )
+            }
+            item {
+                ExerciseDetailCard(
+                    title = "Mechanics",
+                    content = state.exerciseDetails?.mechanic ?: "No Mechanics Listed"
+                )
+            }
+            item {
+                ExerciseDetailCard(
+                    title = "Level",
+                    content = state.exerciseDetails?.level ?: "No Level Listed"
+                )
+            }
+            item {
+                ExerciseDetailCard(
+                    title = "Force",
+                    content = state.exerciseDetails?.force ?: "No Force Listed"
+                )
+            }
+            item {
+                ExerciseDetailCard(
+                    title = "Category",
+                    content = state.exerciseDetails?.category ?: "No Category Listed"
+                )
+            }
+            item {
+                ExerciseDetailListCard(
+                    title = "Instructions",
+                    content = state.exerciseDetails?.instructions
+                        ?: listOf("No Instructions Listed")
+                )
+            }
         }
     }
 }

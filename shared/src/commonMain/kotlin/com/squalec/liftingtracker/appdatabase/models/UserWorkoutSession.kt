@@ -15,4 +15,5 @@ data class  UserWorkoutSession(
     @ColumnInfo(name = "date") val date: String = "",
     @ColumnInfo(name = "duration") val duration: Long = 0,
     @ColumnInfo(name = "calories_burned") val caloriesBurned: Int = 0,
+    @ColumnInfo(name = "metricType") val metricType: String = "LB",
 )

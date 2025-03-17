@@ -24,7 +24,7 @@ import com.squalec.liftingtracker.appdatabase.models.UserWorkoutSession
     version = 3,
 
     autoMigrations = [
-        AutoMigration (from = 2, to = 3)
+//        AutoMigration (from = 2, to = 3)
     ]
 )
 @TypeConverters(Converters::class)

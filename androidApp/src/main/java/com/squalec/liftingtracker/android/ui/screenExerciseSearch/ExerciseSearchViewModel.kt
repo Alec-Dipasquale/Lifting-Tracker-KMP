@@ -2,6 +2,7 @@ package com.squalec.liftingtracker.android.ui.screenExerciseSearch
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.squalec.liftingtracker.appdatabase.Logs
 import kotlinx.coroutines.flow.StateFlow
 import com.squalec.liftingtracker.appdatabase.models.ExerciseDetails
 import com.squalec.liftingtracker.appdatabase.repositories.ExerciseDetailsRepository
@@ -31,6 +32,7 @@ class ExerciseSearchViewModel (private val exerciseDetailsRepository: ExerciseDe
     }
 
     private fun updateOperator(operator: Operator) {
+        Logs().debug("Operator changed to $operator")
         _state.update {
             it.copy(
                 muscleFilterState = it.muscleFilterState.copy(
@@ -48,7 +50,7 @@ class ExerciseSearchViewModel (private val exerciseDetailsRepository: ExerciseDe
         }
         viewModelScope.launch {
             val muscleNames = exerciseDetailsRepository.muscleNames()
-            Timber.d("Muscle names: $muscleNames")
+            Logs().debug("Muscle names received for search filter with ${muscleNames.size} results")
             _state.update {
                 it.copy(
                     isExerciseLoading = false,
