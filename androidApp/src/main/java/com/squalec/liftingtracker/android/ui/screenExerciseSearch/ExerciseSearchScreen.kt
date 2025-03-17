@@ -47,6 +47,7 @@ import com.squalec.liftingtracker.android.ui.utilities.customShadow
 import com.squalec.liftingtracker.appdatabase.models.ExerciseDetails
 import com.squalec.liftingtracker.appdatabase.repositories.Operator
 import org.koin.androidx.compose.koinViewModel
+import org.koin.androidx.compose.viewModel
 
 @Composable
 fun ExerciseSearchScreen(
@@ -82,6 +83,9 @@ fun ExerciseSearchScreen(
         },
         onExerciseDetailsClicked = { exerciseId ->
             navController.navigate(Destination.ExerciseDetail(exerciseId))
+        },
+        onOperatorChanged = { operator ->
+            viewModel.intent(ExerciseSearchIntent.OperatorChanged(operator))
         }
     )
 }
@@ -93,7 +97,8 @@ fun ExerciseSearchContent(
     onSearchTextChanged: (String) -> Unit,
     onMuscleFilterUpdated: (List<String>) -> Unit,
     onExerciseClicked: (String) -> Unit,
-    onExerciseDetailsClicked: (String) -> Unit
+    onExerciseDetailsClicked: (String) -> Unit,
+    onOperatorChanged: (Operator) -> Unit
 ) {
     BackgroundDefault {
         Column(
@@ -137,7 +142,17 @@ fun ExerciseSearchContent(
                     muscleNames = state.muscleNames ?: emptyList(),
                     selectedMuscles = state.filters.muscle ?: emptyList(),
                     onMuscleClicked = onMuscleFilterUpdated,
-                    onIntent = {},
+                    onIntent = {
+                        when (it) {
+                            is ExerciseSearchIntent.UpdateFilter -> {
+                                onMuscleFilterUpdated(it.filter.muscle ?: emptyList())
+                            }
+                            is ExerciseSearchIntent.OperatorChanged -> {
+                                onOperatorChanged(it.operator)
+                            }
+                            else -> {}
+                        }
+                    },
                     filterState = state.muscleFilterState
                 )
             }
@@ -239,7 +254,8 @@ fun ExerciseSearchContentPreview() {
             onSearchTextChanged = {},
             onMuscleFilterUpdated = {},
             onExerciseClicked = {},
-            onExerciseDetailsClicked = {}
+            onExerciseDetailsClicked = {},
+            onOperatorChanged = { Operator.AND } // Default to AND for preview purposes
         )
     }
 }
